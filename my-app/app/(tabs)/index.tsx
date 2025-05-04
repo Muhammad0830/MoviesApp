@@ -1,0 +1,103 @@
+import {
+  Text,
+  View,
+  Image,
+  ScrollView,
+  FlatList,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
+import { Link } from "expo-router";
+import { images } from "@/constants/images";
+import { icons } from "@/constants/icons";
+import SearchBar from "@/components/searchBar";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import useFetch from "@/services/useFetch";
+import { fetchMovies } from "@/services/api";
+import MovieCard from "@/components/movieCard";
+
+export default function Index() {
+  const router = useRouter();
+  const [query, setQuery] = useState<String>("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const {
+    data: movies,
+    loading: moviesLoading,
+    error: moviesError,
+  } = useFetch(() => fetchMovies({ query: "" }));
+
+
+  useEffect(() => {
+    setFilteredData(movies)
+  }, [movies])
+  
+  useEffect(() => {
+    const q = query?.toLowerCase();
+    const filtered = movies?.filter((item: any) =>
+      item.title.toLowerCase().includes(q)
+    );
+    setFilteredData(filtered);
+  }, [query]);
+
+  return (
+    <View className="flex-1 bg-primary">
+      <Image source={images.bg} className="absolute w-full z-0" />
+      <Image source={icons.logo} className="w-12 h-10 mt-10 mb-5 mx-auto" />
+      <View className="mt-5 mb-5 px-4">
+        <SearchBar
+          onPress={() => router.push("/search")}
+          placeholder="Search for a movie"
+          value=""
+          onChangeText={(text: string) => setQuery(text)}
+        />
+      </View>
+      <View className="mb-5">
+        <TextInput
+          placeholder="Search..."
+          value={query as string}
+          onChangeText={(text: string) => setQuery(text)}
+          style={{
+            borderWidth: 1,
+            borderColor: "gray",
+            borderRadius: 8,
+            padding: 10,
+          }}
+        />
+      </View>
+
+      {moviesLoading ? (
+        <ActivityIndicator
+          size="large"
+          color="#0000ff"
+          className="mt-10 self-center"
+        />
+      ) : moviesError ? (
+        <Text>Error: {moviesError?.message}</Text>
+      ) : !filteredData ? (
+        <Text>no filterData</Text>
+      ) : filteredData?.length === 0 ? (
+        <View>
+          <Text className="text-white mx-auto">No results found</Text>
+        </View>
+      ) : (
+        <FlatList
+          className="flex-1 px-5"
+          numColumns={3}
+          showsVerticalScrollIndicator={false}
+          data={filteredData}
+          keyExtractor={(item: any) => item.id}
+          renderItem={({item}: any) => <MovieCard gridNum={3} item={item} />}
+          columnWrapperStyle={{
+            gap: 10,
+            marginVertical: 5,
+          }}
+        />
+      )}
+    </View>
+  );
+}
