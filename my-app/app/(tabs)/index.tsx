@@ -31,11 +31,10 @@ export default function Index() {
     error: moviesError,
   } = useFetch(() => fetchMovies({ query: "" }));
 
-
   useEffect(() => {
-    setFilteredData(movies)
-  }, [movies])
-  
+    setFilteredData(movies);
+  }, [movies]);
+
   useEffect(() => {
     const q = query?.toLowerCase();
     const filtered = movies?.filter((item: any) =>
@@ -91,13 +90,15 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item: any) => item.id}
-          renderItem={({item}: any) => <MovieCard gridNum={3} item={item} />}
+          renderItem={({ item }: any) => <MovieCard gridNum={3} item={item} />}
           columnWrapperStyle={{
             gap: 10,
             marginVertical: 5,
           }}
         />
       )}
+      
+      <View className="mb-20"></View>
     </View>
   );
 }

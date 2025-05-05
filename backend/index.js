@@ -20,6 +20,20 @@ app.get("/movies", (req, res) => {
   res.json(data);
 });
 
+app.get('/moviesDB', async (req, res) => {
+  try {
+    const Movies = await db.query(`Select id, title, description, image, movie_banner, original_title, original_title_romanised, director, producer, release_date, running_time, score from movies;`);
+    if(Movies){
+      res.status(200).json(Movies[0])
+    } else {
+      res.status(404).json({ message: "No movies found" })
+    }
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+})
+
+// inserting initial movies to the database
 // app.get("/insert_first_movies", async (req, res) => {
 //   try {
 //     const response = await axios.get(URL);

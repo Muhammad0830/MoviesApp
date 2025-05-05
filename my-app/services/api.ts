@@ -1,5 +1,5 @@
 export const URL_CONFIG = {
-  BASE_URL: "https://ghibliapi.vercel.app",
+  BASE_URL: process.env.EXPO_PUBLIC_MOVIE_API_URL,
   // API_KEY: process.env.EXPO_PUBLIC_MOVIE_API_KEY,
   headers: {
     accept: "application/json",
@@ -8,8 +8,7 @@ export const URL_CONFIG = {
 };
 
 export const fetchMovies = async ({ query }: { query: string }) => {
-  const endpoint = `${URL_CONFIG.BASE_URL}/films`;
-
+  const endpoint = `${URL_CONFIG.BASE_URL}/moviesDB`;
   const response = await fetch(endpoint, {
     method: "GET",
     headers: URL_CONFIG.headers,

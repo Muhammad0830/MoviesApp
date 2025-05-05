@@ -25,7 +25,7 @@ const MovieCard = ({ item, gridNum }: any) => {
               <View className="flex flex-row gap-1 items-center">
                 <Image source={icons.star} className="w-2 h-2" />
                 <Text className="text-white text-[8px]">
-                  {item.rt_score / 10}
+                  {item.score / 10}
                 </Text>
               </View>
               <Text className="text-white text-[8px] font-light">
