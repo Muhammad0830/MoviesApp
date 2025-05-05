@@ -20,42 +20,43 @@ app.get("/movies", (req, res) => {
   res.json(data);
 });
 
-app.get('/practice', async (req, res) => {
-    try{
-        const movie_insert = await db.execute(`
-            INSERT INTO movies (name, description, movie_id, image, movie_banner) 
-            VALUE (:name, :description, :movie_id, :image, :movie_banner);`,
-            {
-                name: 'Practice',
-                description: 'Practice description',
-                movie_id: 1,
-                image: 'https://image.tmdb.org/t/p/w500/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg',
-                movie_banner: 'https://image.tmdb.org/t/p/original/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg'
-            })
-        
-        res.status(200).json({
-            movie: {
-                name: 'Practice',
-                description: 'Practice description',
-                movie_id: 1,
-                image: 'https://image.tmdb.org/t/p/w500/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg',
-                movie_banner: 'https://image.tmdb.org/t/p/original/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg'
-            }
-        })
-    } catch(err) {
-        res.status(500).send({"error": err.message})
-    }
-})
+// app.get("/insert_first_movies", async (req, res) => {
+//   try {
+//     const response = await axios.get(URL);
+//     const movies = response.data;
 
-app.get('/init_countries', async (req, res) => {
-    try{
-        const response = await axios.get(URL)
-        const countries = response.data
+//     for (const movie of movies) {
+//         const movie_insert = await db.execute(
+//           `
+//                   INSERT INTO movies (
+//                       title, description, movie_id, image,
+//                       movie_banner, original_title, original_title_romanised,
+//                       director, producer, release_date, running_time, score)
+//                   VALUE (:title, :description, :movie_id, :image, :movie_banner,
+//                       :original_title, :original_title_romanised, :director,
+//                       :producer, :release_date, :running_time, :score);`,
+//           {
+//             title: movie.title,
+//             description: movie.description,
+//             movie_id: movie.id,
+//             image: movie.image,
+//             movie_banner: movie.movie_banner,
+//             original_title: movie.original_title,
+//             original_title_romanised: movie.original_title_romanised,
+//             director: movie.director,
+//             producer: movie.producer,
+//             release_date: movie.release_date,
+//             running_time: movie.running_time,
+//             score: movie.rt_score,
+//           }
+//         );
+//     }
 
-    } catch(err){
-        res.status(500).send({"error": err.message})
-    }
-})
+//     res.status(200).send({ message: "Data inserted successfully" });
+//   } catch (err) {
+//     res.status(500).send({ error: err.message });
+//   }
+// });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
