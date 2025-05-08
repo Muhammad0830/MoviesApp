@@ -26,7 +26,7 @@ export const fetchMovies = async ({ query }: { query: string }) => {
 export const fetchEachMovie = async ({id} : {id: number}) => {
   console.log('fetching a movie...')
   const endpoint = `${URL_CONFIG.BASE_URL}/moviesDB/${id}`;
-  console.log('endpoint', endpoint)
+
   const response = await fetch(endpoint, {
     method: "GET",
     headers: URL_CONFIG.headers,
@@ -37,6 +37,7 @@ export const fetchEachMovie = async ({id} : {id: number}) => {
   }
 
   const data = await response.json();
+  console.log('fetched succesfully to the', endpoint)
 
   return data;
 };

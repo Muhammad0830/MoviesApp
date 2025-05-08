@@ -12,7 +12,7 @@ const TabIcon = ({ focused, text, icon }: any) => {
       className={`flex flex-row min-w-[92px] min-h-16 flex-1 justify-center mt-4 items-center rounded-full overflow-hidden`}
     >
       <Image source={icon} tintColor="#151312" className="size-5" />
-      <Text className="text-secondary text-base font-semibold ml-2">
+      <Text className="text-text_secondary text-base font-semibold ml-2">
         {text}
       </Text>
     </ImageBackground>

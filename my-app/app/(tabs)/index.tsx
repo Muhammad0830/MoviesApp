@@ -45,7 +45,7 @@ export default function Index() {
   }, [query]);
 
   return (
-    <View className="flex-1 bg-primary">
+    <View className="flex-1 bg-bg_primary">
       <Image source={images.bg} className="absolute w-full z-0" />
       <Image source={icons.logo} className="w-12 h-10 mt-10 mb-5 mx-auto" />
       <View className="mt-5 mb-5 px-4">
@@ -86,15 +86,14 @@ export default function Index() {
         </View>
       ) : (
         <FlatList
-          className="flex-1 px-5"
+          className="flex-1 px-2"
           numColumns={3}
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item: any) => item.id}
-          renderItem={({ item }: any) => <MovieCard gridNum={3} item={item} />}
+          renderItem={({ item }: any) => <MovieCard gridNum={3} item={item} gap={4}/>}
           columnWrapperStyle={{
-            gap: 10,
-            marginVertical: 5,
+            marginVertical: 3,
           }}
           ListFooterComponent={
             <View>
