@@ -38,7 +38,6 @@ export const fetchEachMovie = async ({id} : {id: number}) => {
 
   const data = await response.json();
   console.log('fetched succesfully to the', endpoint)
-  //somethinh is added
 
   return data;
 };
