@@ -6,16 +6,12 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send(`<h1>Hello World!</h1>`);
-});
-
 // to get list of movies
 app.get("/moviesDB", async (req, res) => {
   try {
-    console.log('working')
+    console.log("working");
     const Movies = await db.query(
-      `Select id, title, description, image, movie_banner, original_title, original_title_romanised, director, producer, release_date, running_time, score from movies;`
+      `Select id, title, description, image, movie_banner, original_title, original_title_romanised, director, producer, release_date, running_time, score, genre from movies;`
     );
     if (Movies) {
       res.status(200).json(Movies[0]);
@@ -31,7 +27,6 @@ app.get("/moviesDB", async (req, res) => {
 app.get("/moviesDB/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    console.log('id', id)
 
     if (!id) {
       res.status(400).json({ message: "No id provided" });
@@ -40,10 +35,18 @@ app.get("/moviesDB/:id", async (req, res) => {
     }
 
     const Movie = await db.query(`Select * from movies where id = ${id};`);
-    console.log('Movie', Movie[0])
+    console.log("Movie", Movie[0]);
+
+    console.log("something", {
+      ...Movie[0][0],
+      genre: Movie[0][0].genre.split(",").map((item) => item.trim()),
+    });
 
     if (Movie[0].length > 0) {
-      res.status(200).json(Movie[0]);
+      res.status(200).json({
+        ...Movie[0][0],
+        genre: Movie[0][0].genre.split(",").map((item) => item.trim()),
+      });
     } else {
       res.status(404).json({ message: "No movies found" });
     }
