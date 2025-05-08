@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TextInput,
+  Pressable,
 } from "react-native";
 import { Link } from "expo-router";
 import { images } from "@/constants/images";
@@ -95,10 +96,21 @@ export default function Index() {
             gap: 10,
             marginVertical: 5,
           }}
+          ListFooterComponent={
+            <View>
+              <Link
+                href={`/movies/${152}` as any}
+                asChild
+                className="bg-red-500 inline-block w-[200px] h-[200px]"
+              >
+                <Text className="text-white">BOX</Text>
+              </Link>
+
+              <View className="pb-20"></View>
+            </View>
+          }
         />
       )}
-      
-      <View className="mb-20"></View>
     </View>
   );
 }

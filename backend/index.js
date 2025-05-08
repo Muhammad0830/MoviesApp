@@ -6,10 +6,6 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send(`<h1>Hello World!</h1>`);
-});
-
 // to get list of movies
 app.get("/moviesDB", async (req, res) => {
   try {
