@@ -5,7 +5,7 @@ import MovieDetails from "@/components/movieDetails";
 import { useEffect, useState } from "react";
 import { fetchEachMovie } from "@/services/api";
 import useFetch from "@/services/useFetch";
-;
+
 
 const movieDetails = () => {
   const [movie, setMovie] = useState<any>({});
@@ -20,6 +20,12 @@ const movieDetails = () => {
       setMovie(data);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (id) {
+      refetch();
+    }
+  }, [id]);
 
   if (movie && !movie.title) {
     return (

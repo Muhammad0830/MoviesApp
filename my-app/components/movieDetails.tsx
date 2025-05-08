@@ -7,11 +7,10 @@ import React, {
 } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
-import RecommendedMovies from "@/components/recommendedMovies";
 import MovieCard from "./movieCard";
 
 const MovieDetails = ({ movie }: any) => {
