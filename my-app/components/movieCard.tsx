@@ -4,7 +4,6 @@ import { Link } from "expo-router";
 import { icons } from "@/constants/icons";
 
 const MovieCard = ({ item, gridNum, gap }: any) => {
-//   console.log("poster", item.movie_banner);
   
   return (
     <Link href={`/movies/${item.id}` as any} asChild>
