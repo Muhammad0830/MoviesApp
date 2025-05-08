@@ -5,7 +5,7 @@ import { icons } from "@/constants/icons";
 
 const MovieCard = ({ item, gridNum, gap }: any) => {
 //   console.log("poster", item.movie_banner);
-
+  
   return (
     <Link href={`/movies/${item.id}` as any} asChild>
       <TouchableOpacity className={`${gridNum == 2 ? "w-1/2" : gridNum == 3 ? "w-1/3" : ""}`} >
