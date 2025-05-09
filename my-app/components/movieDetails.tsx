@@ -44,12 +44,13 @@ const MovieDetails = ({ movie }: any) => {
       <FlatList
         data={movies}
         renderItem={({ item }: any) => (
-          <MovieCard item={item} gridNum={2} gap={6 as number} />
+          <MovieCard item={item} gridNum={2} gap={8 as number} />
         )}
         keyExtractor={(item: any) => item.id}
         numColumns={2}
         columnWrapperStyle={{
-          marginVertical: 6,
+          marginVertical: 5,
+          justifyContent: "space-between",
         }}
         ListHeaderComponent={
           <View className="px-2">

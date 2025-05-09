@@ -18,12 +18,12 @@ const MovieCard = ({ item, gridNum, gap }: any) => {
         >
           <Image
             source={{ uri: item.movie_banner }}
-            className="w-full aspect-square"
+            className="w-full aspect-square rounded-md"
           />
           <View className="p-1.5">
             <Text
               numberOfLines={1}
-              className="text-white text-xs font-bold mb-1"
+              className={`text-white text-[${gridNum == 3 ? 10 : gridNum == 2 ? 14 : 0}px] font-bold mb-1`}
             >
               {item.title}
             </Text>

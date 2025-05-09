@@ -30,8 +30,8 @@ export default function Index() {
     data: movies,
     loading: moviesLoading,
     error: moviesError,
-    reset, 
-    refetch
+    reset,
+    refetch,
   } = useFetch(() => fetchMovies({ query: "" }));
 
   useEffect(() => {
@@ -57,36 +57,14 @@ export default function Index() {
 
   return (
     <View className="flex-1 bg-bg_primary">
-      <Image source={images.bg} className="absolute w-full z-0" />
-      <Image source={icons.logo} className="w-12 h-10 mt-10 mb-5 mx-auto" />
-      <View className="mt-5 mb-5 px-4">
-        <SearchBar
-          onPress={() => router.push("/search")}
-          placeholder="Search for a movie"
-          value=""
-          onChangeText={(text: string) => setQuery(text)}
-        />
-      </View>
-      <View className="mb-5">
-        <TextInput
-          placeholder="Search..."
-          value={query as string}
-          onChangeText={(text: string) => setQuery(text)}
-          style={{
-            borderWidth: 1,
-            borderColor: "gray",
-            borderRadius: 8,
-            padding: 10,
-          }}
-        />
-      </View>
-
       {moviesLoading ? (
-        <ActivityIndicator
-          size="large"
-          color="#0000ff"
-          className="mt-10 self-center"
-        />
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator
+            size={70}
+            color="#0000ff"
+            className="mt-10 self-center"
+          />
+        </View>
       ) : moviesError ? (
         <View className="flex-1 justify-center items-center">
           <Text className="text-white text-[24px] font-bold">
@@ -94,27 +72,47 @@ export default function Index() {
           </Text>
         </View>
       ) : !filteredData ? (
-        <View className="justify-center items-center">
-          <Text className="text-white text-[24px] font-bold">no filterData</Text>
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-white text-[24px] font-bold">
+            no filterData
+          </Text>
         </View>
       ) : filteredData?.length === 0 ? (
-        <View>
+        <View className="flex-1 justify-center items-center">
           <Text className="text-white mx-auto">No results found</Text>
         </View>
       ) : (
         <FlatList
-          className="flex-1 px-2"
+          className="flex-1"
           numColumns={3}
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item: any) => item.id}
           renderItem={({ item }: any) => (
-            <MovieCard gridNum={3} item={item} gap={4 as number} />
+            <MovieCard gridNum={3} item={item} gap={8 as number} />
           )}
           columnWrapperStyle={{
-            marginVertical: 3,
-            justifyContent: 'space-between',
+            marginVertical: 4,
+            justifyContent: "space-between",
+            paddingHorizontal: 8,
           }}
+          ListHeaderComponent={
+            <View className="px-2">
+              <Image source={images.bg} className="absolute flex-1 z-0" />
+              <Image
+                source={icons.logo}
+                className="w-12 h-10 mt-10 mb-5 mx-auto"
+              />
+              <View className="mt-5 mb-5 px-2">
+                <SearchBar
+                  onPress={() => router.push("/search")}
+                  placeholder="Search for a movie"
+                  value=""
+                  onChangeText={(text: string) => setQuery(text)}
+                />
+              </View>
+            </View>
+          }
           ListFooterComponent={
             <View>
               <Link
