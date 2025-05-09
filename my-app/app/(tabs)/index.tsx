@@ -91,7 +91,7 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item: any) => item.id}
-          renderItem={({ item }: any) => <MovieCard gridNum={3} item={item} gap={4}/>}
+          renderItem={({ item }: any) => <MovieCard gridNum={3} item={item} gap={3 as number}/>}
           columnWrapperStyle={{
             marginVertical: 3,
           }}

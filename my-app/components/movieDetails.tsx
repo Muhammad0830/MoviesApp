@@ -10,8 +10,9 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FlatList } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import useFetch from "@/services/useFetch";
-import { fetchMovies } from "@/services/api";
+import { fetchMovies, SaveMovie } from "@/services/api";
 import MovieCard from "./movieCard";
+import { MovieType } from "@/types/MovieType";
 
 const MovieDetails = ({ movie }: any) => {
   const [movies, setMovies] = useState([]);
@@ -32,6 +33,10 @@ const MovieDetails = ({ movie }: any) => {
 
   const randomShuffle = (arr: any[]) => {
     return arr.sort(() => Math.random() - 0.5);
+  };
+
+  const handleSave = async (movie: MovieType) => {
+    SaveMovie(movie);
   };
 
   return (
@@ -92,9 +97,12 @@ const MovieDetails = ({ movie }: any) => {
               <View className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 ">
                 <FontAwesome name="thumbs-up" size={17} color="white" />
               </View>
-              <View className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 ">
+              <TouchableOpacity
+                onPress={() => handleSave(movie as MovieType)}
+                className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
+              >
                 <FontAwesome name="bookmark" size={17} color="white" />
-              </View>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity

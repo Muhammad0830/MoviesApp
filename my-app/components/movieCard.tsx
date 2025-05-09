@@ -8,7 +8,7 @@ const MovieCard = ({ item, gridNum, gap }: any) => {
   return (
     <Link href={`/movies/${item.id}` as any} asChild>
       <TouchableOpacity className={`${gridNum == 2 ? "w-1/2" : gridNum == 3 ? "w-1/3" : ""}`} >
-        <View className={`rounded-md border border-primary/40 flex flex-col overflow-hidden mx-[${gap}px]`}>
+        <View className={`rounded-md border border-primary/40 flex flex-col overflow-hidden`} style={{ marginHorizontal: gap}}>
           <Image
             source={{ uri: item.movie_banner }}
             className="w-full aspect-square"
