@@ -76,7 +76,7 @@ const search = () => {
       <FlatList
         data={filteredData}
         renderItem={({ item }: any) =>
-          query ? <MovieCard gridNum={2} item={item} /> : null
+          query ? <MovieCard gridNum={2} gap={6 as number} item={item} /> : null
         }
         keyExtractor={(item: any) => item.id}
         numColumns={2}
