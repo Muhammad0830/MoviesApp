@@ -53,7 +53,7 @@ const search = () => {
 
   useFocusEffect(
     useCallback(() => {
-      refetchMovies();
+      setQuery("")
       return;
     }, [])
   );
