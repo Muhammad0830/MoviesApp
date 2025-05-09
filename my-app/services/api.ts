@@ -92,3 +92,25 @@ export const GetSavedMovies = async () => {
     console.error(err)
   }
 }
+
+export const DeleteFromSavedMovies = async (id: number) => {
+  try {
+    console.log("deleting a movie...");
+    const endpoint = `${URL_CONFIG.BASE_URL}/savedMovies/${id}`;
+    const response = await fetch(endpoint, {
+      method: "DELETE",
+      headers: URL_CONFIG.headers,
+    })
+
+    if(!response.ok) {
+      throw new Error("Failed to delete a movie");
+    }
+
+    const data = await response.json();
+    console.log("deleted succesfully to the", endpoint);
+    
+    return data;
+  } catch (err) {
+    console.error(err)
+  }
+}
