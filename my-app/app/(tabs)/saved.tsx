@@ -67,13 +67,15 @@ const saved = () => {
   }
 
   if (!loading && !savedMovies) {
-    return (
-      <View className="flex-1 justify-center items-center bg-bg_primary">
-        <Text className="text-white text-[24px] font-bold">
-          No saved movies
-        </Text>
-      </View>
-    );
+    setTimeout(() => {
+      return (
+        <View className="flex-1 justify-center items-center bg-bg_primary">
+          <Text className="text-white text-[24px] font-bold">
+            No saved movies
+          </Text>
+        </View>
+      ); 
+    }, 1000)
   }
 
   return (
