@@ -71,3 +71,24 @@ export const SaveMovie = async (movie: MovieType) => {
     console.error(err);
   }
 };
+
+export const GetSavedMovies = async () => {
+  try {
+    console.log("getting saved movies...");
+    const endpoint = `${URL_CONFIG.BASE_URL}/savedMovies`;
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: URL_CONFIG.headers,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (err) {
+    console.error(err)
+  }
+}

@@ -8,12 +8,12 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import { images } from "@/constants/images";
 import { icons } from "@/constants/icons";
 import SearchBar from "@/components/searchBar";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
 import MovieCard from "@/components/movieCard";
@@ -30,6 +30,8 @@ export default function Index() {
     data: movies,
     loading: moviesLoading,
     error: moviesError,
+    reset, 
+    refetch
   } = useFetch(() => fetchMovies({ query: "" }));
 
   useEffect(() => {
@@ -43,6 +45,15 @@ export default function Index() {
     );
     setFilteredData(filtered);
   }, [query]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+      return () => {
+        console.log("refetching");
+      };
+    }, [])
+  );
 
   return (
     <View className="flex-1 bg-bg_primary">
@@ -77,9 +88,15 @@ export default function Index() {
           className="mt-10 self-center"
         />
       ) : moviesError ? (
-        <Text>Error: {moviesError?.message}</Text>
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-white text-[24px] font-bold">
+            Error: {moviesError?.message}
+          </Text>
+        </View>
       ) : !filteredData ? (
-        <Text>no filterData</Text>
+        <View className="justify-center items-center">
+          <Text className="text-white text-[24px] font-bold">no filterData</Text>
+        </View>
       ) : filteredData?.length === 0 ? (
         <View>
           <Text className="text-white mx-auto">No results found</Text>
@@ -91,9 +108,12 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item: any) => item.id}
-          renderItem={({ item }: any) => <MovieCard gridNum={3} item={item} gap={3 as number}/>}
+          renderItem={({ item }: any) => (
+            <MovieCard gridNum={3} item={item} gap={4 as number} />
+          )}
           columnWrapperStyle={{
             marginVertical: 3,
+            justifyContent: 'space-between',
           }}
           ListFooterComponent={
             <View>

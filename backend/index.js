@@ -70,13 +70,32 @@ app.post("/moviesDB", async (req, res) => {
       return res.status(400).json({ message: "Movie already saved" });
     }
 
-    console.log('movie', movie[0])
-    const movieInsert = await db.query("INSERT INTO saved_movies (movie_id) VALUES (:id)", {
-      id: id
-    })
+    console.log("movie", movie[0]);
+    const movieInsert = await db.query(
+      "INSERT INTO saved_movies (movie_id) VALUES (:id)",
+      {
+        id: id,
+      }
+    );
 
     if (movieInsert) {
       return res.status(200).json({ message: "saved successfully" });
+    } else {
+      return res.status(404).json({ message: "No movies found" });
+    }
+  } catch (err) {
+    return res.status(500).send({ error: err.message });
+  }
+});
+
+app.get("/savedMovies", async (req, res) => {
+  try {
+    const savedMovies = await db.query(`Select m. * from saved_movies sm 
+      Join movies m on sm.movie_id = m.id`
+    );
+
+    if (savedMovies[0].length > 0) {
+      return res.status(200).json(savedMovies[0]);
     } else {
       return res.status(404).json({ message: "No movies found" });
     }
