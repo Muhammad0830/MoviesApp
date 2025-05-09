@@ -50,7 +50,6 @@ export default function Index() {
     useCallback(() => {
       refetch();
       return () => {
-        console.log("refetching");
       };
     }, [])
   );

@@ -70,7 +70,6 @@ app.post("/moviesDB", async (req, res) => {
       return res.status(400).json({ message: "Movie already saved" });
     }
 
-    console.log("movie", movie[0]);
     const movieInsert = await db.query(
       "INSERT INTO saved_movies (movie_id) VALUES (:id)",
       {
@@ -90,12 +89,37 @@ app.post("/moviesDB", async (req, res) => {
 
 app.get("/savedMovies", async (req, res) => {
   try {
-    const savedMovies = await db.query(`Select m. * from saved_movies sm 
-      Join movies m on sm.movie_id = m.id`
-    );
+    const savedMovies = await db.query(`SELECT m.*
+      FROM saved_movies sm
+      JOIN movies m ON sm.movie_id = m.id
+      ORDER BY sm.saved_at DESC;
+    `);
 
     if (savedMovies[0].length > 0) {
       return res.status(200).json(savedMovies[0]);
+    } else {
+      return res.status(404).json({ message: "No movies found" });
+    }
+  } catch (err) {
+    return res.status(500).send({ error: err.message });
+  }
+});
+
+app.delete("/savedMovies/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).json({ error: "id is required" });
+    }
+
+    const savedMovies = await db.query(
+      `Select * from saved_movies where movie_id = ${id};`
+    );
+
+    if (savedMovies[0].length > 0) {
+      await db.query(`Delete from saved_movies where movie_id = ${id};`);
+      return res.status(200).json({ message: "deleted successfully" });
     } else {
       return res.status(404).json({ message: "No movies found" });
     }

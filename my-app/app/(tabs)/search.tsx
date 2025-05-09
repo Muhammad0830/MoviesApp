@@ -6,21 +6,17 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SearchBar from "@/components/searchBar";
 import { images } from "@/constants/images";
 import MovieCard from "@/components/movieCard";
 import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 const search = () => {
-  const router = useRouter();
   const [query, setQuery] = useState<String>("");
   const [filteredData, setFilteredData] = useState([]);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
   const [showNoResults, setShowNoResults] = useState(false);
 
   const {
@@ -36,16 +32,6 @@ const search = () => {
   }, [movies]);
 
   useEffect(() => {
-    // const func = async () => {
-    //   if (query.trim()) {
-    //     await refetchMovies();
-    //   } else {
-    //     resetMovies();
-    //   }
-    // };
-
-    // func();
-
     const q = query?.toLowerCase();
     const filtered = movies?.filter((item: any) =>
       item.title.toLowerCase().includes(q)
@@ -65,6 +51,13 @@ const search = () => {
     }
   }, [filteredData, moviesError, moviesLoading]);
 
+  useFocusEffect(
+    useCallback(() => {
+      refetchMovies();
+      return;
+    }, [])
+  );
+
   return (
     <View className="flex-1 bg-bg_primary">
       <Image
@@ -76,17 +69,20 @@ const search = () => {
       <FlatList
         data={filteredData}
         renderItem={({ item }: any) =>
-          query ? <MovieCard gridNum={2} gap={6 as number} item={item} /> : null
+          query ? (
+            <MovieCard gridNum={2} item={item} gap={15 as number} />
+          ) : null
         }
         keyExtractor={(item: any) => item.id}
         numColumns={2}
-        className="px-5 mt-5"
+        className="mt-5"
         columnWrapperStyle={{
-          gap: 10,
           marginVertical: 5,
+          justifyContent: "space-between",
+          paddingHorizontal: 10,
         }}
         ListHeaderComponent={
-          <>
+          <View className="px-3">
             <View className="mb-4">
               <SearchBar
                 placeholder="Search for a movie"
@@ -96,11 +92,13 @@ const search = () => {
             </View>
 
             {moviesLoading ? (
-              <ActivityIndicator
-                size="large"
-                color="#0000ff"
-                className="m3-10 self-center"
-              />
+              <View className="flex-1 justify-center items-center">
+                <ActivityIndicator
+                  size="large"
+                  color="#0000ff"
+                  className="self-center"
+                />
+              </View>
             ) : moviesError ? (
               <Text>Error: {moviesError?.message}</Text>
             ) : query ? (
@@ -119,7 +117,7 @@ const search = () => {
                 </Text>
               </View>
             )}
-          </>
+          </View>
         }
         ListEmptyComponent={
           showNoResults ? (

@@ -49,7 +49,6 @@ const saved = () => {
     useCallback(() => {
       refetch();
       return () => {
-        console.log("refetching");
       };
     }, [])
   );

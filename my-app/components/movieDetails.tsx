@@ -5,20 +5,27 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { FlatList } from "react-native-gesture-handler";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faBookmark as solidBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark as regularBookmark } from "@fortawesome/free-regular-svg-icons";
+import { FlatList, Pressable } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import useFetch from "@/services/useFetch";
-import { fetchMovies, SaveMovie } from "@/services/api";
+import { DeleteFromSavedMovies, fetchMovies, GetSavedMovies, SaveMovie } from "@/services/api";
 import MovieCard from "./movieCard";
 import { MovieType } from "@/types/MovieType";
 
 const MovieDetails = ({ movie }: any) => {
   const [movies, setMovies] = useState([]);
+  const [savedMovies, setSavedMovies] = useState([]);
   const [shuffleMovie, setShuffleMovie] = useState([]);
-
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const { data, loading, error } = useFetch(() => fetchMovies({ query: "" }));
+
+  const { data: saved_Movies, loading: savedMoviesLoading, error: savedMoviesError, reset: resetSaved, refetch: refetchSaved } =
+    useFetch(() => GetSavedMovies());
 
   useEffect(() => {
     if (data) {
@@ -31,25 +38,53 @@ const MovieDetails = ({ movie }: any) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if(saved_Movies) {
+      setSavedMovies(saved_Movies);
+      if(saved_Movies?.some((item : any) => item.id === movie.id)) {
+        setIsBookmarked(true);
+      }
+    }
+  }, [saved_Movies])
+
   const randomShuffle = (arr: any[]) => {
     return arr.sort(() => Math.random() - 0.5);
   };
 
   const handleSave = async (movie: MovieType) => {
-    SaveMovie(movie);
+    if(!isBookmarked){
+      SaveMovie(movie);
+      setIsBookmarked(!isBookmarked);
+    } else {
+      DeleteFromSavedMovies(movie.id)
+      setIsBookmarked(!isBookmarked);
+    }
   };
 
+  if(loading) {
+    return (
+      <View className="bg-bg_primary flex-1 justify-center items-center">
+        <ActivityIndicator
+          size="large"
+          color="#0000ff"
+          className="self-center"
+        />
+      </View>
+    )
+  }
+
   return (
-    <View className="w-full flex-1 bg-bg_primary px-2">
+    <View className="w-full flex-1 bg-bg_primary">
       <FlatList
         data={movies}
         renderItem={({ item }: any) => (
-          <MovieCard item={item} gridNum={2} gap={8 as number} />
+          <MovieCard item={item} gridNum={2} gap={15 as number} />
         )}
         keyExtractor={(item: any) => item.id}
         numColumns={2}
         columnWrapperStyle={{
           marginVertical: 5,
+          paddingHorizontal: 10,
           justifyContent: "space-between",
         }}
         ListHeaderComponent={
@@ -99,10 +134,16 @@ const MovieDetails = ({ movie }: any) => {
                 <FontAwesome name="thumbs-up" size={17} color="white" />
               </View>
               <TouchableOpacity
-                onPress={() => handleSave(movie as MovieType)}
+                onPress={() => {
+                  handleSave(movie as MovieType);
+                }}
                 className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
               >
-                <FontAwesome name="bookmark" size={17} color="white" />
+                <FontAwesomeIcon
+                  icon={isBookmarked ? solidBookmark : regularBookmark}
+                  size={17}
+                  color="white"
+                />
               </TouchableOpacity>
             </View>
 
