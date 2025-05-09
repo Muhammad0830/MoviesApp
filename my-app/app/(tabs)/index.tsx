@@ -54,6 +54,18 @@ export default function Index() {
     }, [])
   );
 
+  if (!filteredData) {
+    setTimeout(() => {
+      return (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-white text-[24px] font-bold">
+            no filterData
+          </Text>
+        </View>
+      );
+    }, 1000);
+  }
+
   return (
     <View className="flex-1 bg-bg_primary">
       {moviesLoading ? (
@@ -68,12 +80,6 @@ export default function Index() {
         <View className="flex-1 justify-center items-center">
           <Text className="text-white text-[24px] font-bold">
             Error: {moviesError?.message}
-          </Text>
-        </View>
-      ) : !filteredData ? (
-        <View className="flex-1 justify-center items-center">
-          <Text className="text-white text-[24px] font-bold">
-            no filterData
           </Text>
         </View>
       ) : filteredData?.length === 0 ? (
