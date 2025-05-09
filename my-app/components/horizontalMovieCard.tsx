@@ -1,29 +1,26 @@
-import { View, Text, TouchableOpacity, Image, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { Link } from "expo-router";
 import { icons } from "@/constants/icons";
 
-const MovieCard = ({ item, gridNum, gap }: any) => {
-  const screenWidth = Dimensions.get("window").width - 15;
-  const totalGaps = gap * (gridNum - 1);
-
-  const itemWidth = (screenWidth - totalGaps) / gridNum;
-
+const HorizontalMovieCard = ({ item, gap }: any) => {
   return (
     <Link href={`/movies/${item.id}` as any} asChild>
-      <TouchableOpacity>
+      <TouchableOpacity
+        className='w-[150px] h-full'
+      >
         <View
-          style={{ width: itemWidth }}
-          className={`rounded-md border border-primary/40 flex flex-col overflow-hidden`}
+          className={`rounded-md h-full border border-primary/40 flex flex-col overflow-hidden`}
+          style={{ marginHorizontal: gap }}
         >
           <Image
             source={{ uri: item.movie_banner }}
-            className="w-full aspect-square rounded-md"
+            className="w-full aspect-square"
           />
-          <View className="p-1.5">
+          <View className="p-1.5 flex-1 flex-col justify-between">
             <Text
               numberOfLines={1}
-              className={`text-white text-[${gridNum == 3 ? 10 : gridNum == 2 ? 14 : 0}px] font-bold mb-1`}
+              className="text-white text-xs font-bold mb-1"
             >
               {item.title}
             </Text>
@@ -43,4 +40,4 @@ const MovieCard = ({ item, gridNum, gap }: any) => {
   );
 };
 
-export default MovieCard;
+export default HorizontalMovieCard;

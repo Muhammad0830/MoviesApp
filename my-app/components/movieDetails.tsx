@@ -10,8 +10,9 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FlatList } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import useFetch from "@/services/useFetch";
-import { fetchMovies } from "@/services/api";
+import { fetchMovies, SaveMovie } from "@/services/api";
 import MovieCard from "./movieCard";
+import { MovieType } from "@/types/MovieType";
 
 const MovieDetails = ({ movie }: any) => {
   const [movies, setMovies] = useState([]);
@@ -34,17 +35,22 @@ const MovieDetails = ({ movie }: any) => {
     return arr.sort(() => Math.random() - 0.5);
   };
 
+  const handleSave = async (movie: MovieType) => {
+    SaveMovie(movie);
+  };
+
   return (
     <View className="w-full flex-1 bg-bg_primary px-2">
       <FlatList
         data={movies}
         renderItem={({ item }: any) => (
-          <MovieCard item={item} gridNum={2} gap={6 as number} />
+          <MovieCard item={item} gridNum={2} gap={8 as number} />
         )}
         keyExtractor={(item: any) => item.id}
         numColumns={2}
         columnWrapperStyle={{
-          marginVertical: 6,
+          marginVertical: 5,
+          justifyContent: "space-between",
         }}
         ListHeaderComponent={
           <View className="px-2">
@@ -92,9 +98,12 @@ const MovieDetails = ({ movie }: any) => {
               <View className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 ">
                 <FontAwesome name="thumbs-up" size={17} color="white" />
               </View>
-              <View className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 ">
+              <TouchableOpacity
+                onPress={() => handleSave(movie as MovieType)}
+                className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
+              >
                 <FontAwesome name="bookmark" size={17} color="white" />
-              </View>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity
