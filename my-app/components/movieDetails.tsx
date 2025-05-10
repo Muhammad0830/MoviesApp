@@ -73,6 +73,14 @@ const MovieDetails = ({ movie }: any) => {
     )
   }
 
+  if(!loading && !movie.title) {
+    return (
+      <View className="flex-1 bg-bg_primary justify-center items-center">
+        <Text className="text-white text-[20px] font-bold">No movie found</Text>
+      </View>
+    )
+  }
+
   return (
     <View className="w-full flex-1 bg-bg_primary">
       <FlatList
