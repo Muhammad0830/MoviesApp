@@ -5,7 +5,13 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBookmark as solidBookmark } from "@fortawesome/free-solid-svg-icons";
@@ -13,19 +19,33 @@ import { faBookmark as regularBookmark } from "@fortawesome/free-regular-svg-ico
 import { FlatList, Pressable } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import useFetch from "@/services/useFetch";
-import { DeleteFromSavedMovies, fetchMovies, GetSavedMovies, SaveMovie } from "@/services/api";
+import {
+  DeleteFromSavedMovies,
+  fetchMovies,
+  GetSavedMovies,
+  SaveMovie,
+} from "@/services/api";
 import MovieCard from "./movieCard";
 import { MovieType } from "@/types/MovieType";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const MovieDetails = ({ movie }: any) => {
   const [movies, setMovies] = useState([]);
   const [savedMovies, setSavedMovies] = useState([]);
-  const [shuffleMovie, setShuffleMovie] = useState([]);
+  const [shuffleMovies, setShuffleMovies] = useState([]);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { data, loading, error } = useFetch(() => fetchMovies({ query: "" }));
 
-  const { data: saved_Movies, loading: savedMoviesLoading, error: savedMoviesError, reset: resetSaved, refetch: refetchSaved } =
-    useFetch(() => GetSavedMovies());
+  const navigation = useNavigation();
+
+  const {
+    data: saved_Movies,
+    loading: savedMoviesLoading,
+    error: savedMoviesError,
+    reset: resetSaved,
+    refetch: refetchSaved,
+  } = useFetch(() => GetSavedMovies());
 
   useEffect(() => {
     if (data) {
@@ -34,34 +54,34 @@ const MovieDetails = ({ movie }: any) => {
           item.title !== movie.title && item.description !== movie.description
       );
       setMovies(filtered);
-      setShuffleMovie(randomShuffle(data) as any);
+      setShuffleMovies(randomShuffle(filtered) as any);
     }
   }, [data]);
 
   useEffect(() => {
-    if(saved_Movies) {
+    if (saved_Movies) {
       setSavedMovies(saved_Movies);
-      if(saved_Movies?.some((item : any) => item.id === movie.id)) {
+      if (saved_Movies?.some((item: any) => item.id === movie.id)) {
         setIsBookmarked(true);
       }
     }
-  }, [saved_Movies])
+  }, [saved_Movies]);
 
   const randomShuffle = (arr: any[]) => {
     return arr.sort(() => Math.random() - 0.5);
   };
 
   const handleSave = async (movie: MovieType) => {
-    if(!isBookmarked){
+    if (!isBookmarked) {
       SaveMovie(movie);
       setIsBookmarked(!isBookmarked);
     } else {
-      DeleteFromSavedMovies(movie.id)
+      DeleteFromSavedMovies(movie.id);
       setIsBookmarked(!isBookmarked);
     }
   };
 
-  if(loading) {
+  if (loading) {
     return (
       <View className="bg-bg_primary flex-1 justify-center items-center">
         <ActivityIndicator
@@ -70,21 +90,21 @@ const MovieDetails = ({ movie }: any) => {
           className="self-center"
         />
       </View>
-    )
+    );
   }
 
-  if(!loading && !movie.title) {
+  if (!loading && !movie.title) {
     return (
       <View className="flex-1 bg-bg_primary justify-center items-center">
         <Text className="text-white text-[20px] font-bold">No movie found</Text>
       </View>
-    )
+    );
   }
 
   return (
     <View className="w-full flex-1 bg-bg_primary">
       <FlatList
-        data={movies}
+        data={shuffleMovies}
         renderItem={({ item }: any) => (
           <MovieCard item={item} gridNum={2} gap={15 as number} />
         )}
@@ -98,6 +118,12 @@ const MovieDetails = ({ movie }: any) => {
         ListHeaderComponent={
           <View className="px-2">
             <View className="flex items-center mt-10">
+              <TouchableOpacity
+                className="absolute -top-2 left-4 rounded-full bg-primary/40 p-2"
+                onPress={() => navigation.goBack()}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} size={20} color="white" />
+              </TouchableOpacity>
               <Image
                 source={{ uri: movie.image }}
                 className="w-[200px] h-[300px] rounded-lg"
