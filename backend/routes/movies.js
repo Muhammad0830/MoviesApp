@@ -1,5 +1,7 @@
 const moviesRouter = require("express").Router();
 const db = require("../db");
+const jwt = require("jsonwebtoken");
+const { authenticate } = require("../utils/middleware");
 
 moviesRouter.get("/moviesDB", async (req, res) => {
   try {

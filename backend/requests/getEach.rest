@@ -1,1 +1,0 @@
-GET http://localhost:3001/moviesDB/45db04e4-304a-4933-9823-33f389e8d74d

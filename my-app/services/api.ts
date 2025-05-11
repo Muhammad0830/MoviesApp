@@ -12,7 +12,7 @@ export const URL_CONFIG = {
 };
 
 export const fetchMovies = async ({ query }: { query: string }) => {
-  const endpoint = `${URL_CONFIG.BASE_URL}/moviesDB`;
+  const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesDB`;
   const response = await fetch(endpoint, {
     method: "GET",
     headers: URL_CONFIG.headers,
@@ -29,7 +29,7 @@ export const fetchMovies = async ({ query }: { query: string }) => {
 
 export const fetchEachMovie = async ({ id }: { id: number }) => {
   console.log("fetching a movie...");
-  const endpoint = `${URL_CONFIG.BASE_URL}/moviesDB/${id}`;
+  const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesDB/${id}`;
 
   const response = await fetch(endpoint, {
     method: "GET",
@@ -49,7 +49,7 @@ export const fetchEachMovie = async ({ id }: { id: number }) => {
 export const SaveMovie = async (movie: MovieType) => {
   try {
     console.log("saving a movie...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/moviesDB`;
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesDB`;
     console.log('endpoint', endpoint)
     const response = await fetch(endpoint, {
       method: "POST",
@@ -75,7 +75,7 @@ export const SaveMovie = async (movie: MovieType) => {
 export const GetSavedMovies = async () => {
   try {
     console.log("getting saved movies...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/savedMovies`;
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
     const response = await fetch(endpoint, {
       method: 'GET',
       headers: URL_CONFIG.headers,
@@ -96,7 +96,7 @@ export const GetSavedMovies = async () => {
 export const DeleteFromSavedMovies = async (id: number) => {
   try {
     console.log("deleting a movie...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/savedMovies/${id}`;
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}`;
     const response = await fetch(endpoint, {
       method: "DELETE",
       headers: URL_CONFIG.headers,
