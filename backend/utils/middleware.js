@@ -1,4 +1,19 @@
 const logger = require("./logger");
+const jwt = require("jsonwebtoken");
+
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.sendStatus(401);
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const user = jwt.verify(token, "your_jwt_secret");
+    req.user = user;
+    next();
+  } catch {
+    res.sendStatus(403);
+  }
+};
 
 const unknownEnpoint = (req, res, next) => {
   logger.error(`Unknown endpoint ${req.originalUrl}`);
@@ -21,4 +36,4 @@ const errorHandler = (err, req, res, next) => {
   next(err)
 };
 
-module.exports = { unknownEnpoint, errorHandler, notFound };
+module.exports = { unknownEnpoint, errorHandler, notFound, authenticate };
