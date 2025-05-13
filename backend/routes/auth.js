@@ -12,6 +12,7 @@ authRouter.get('/test', async (req, res) => {
 
 authRouter.post("/signup", async (req, res) => {
   console.log('sign up')
+  console.log('req.body', req.body)
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -28,6 +29,7 @@ authRouter.post("/signup", async (req, res) => {
 
     res.status(201).json({ token, user: { id: userId, email, username } });
   } catch (err) {
+    console.log('error.message', err.message)
     res.status(500).json({ error: "Email might already be used" });
   }
 });

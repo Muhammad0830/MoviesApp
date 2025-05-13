@@ -49,7 +49,7 @@ export const fetchEachMovie = async ({ id }: { id: number }) => {
 export const SaveMovie = async (movie: MovieType) => {
   try {
     console.log("saving a movie...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesDB`;
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
     console.log('endpoint', endpoint)
     const response = await fetch(endpoint, {
       method: "POST",
@@ -81,11 +81,17 @@ export const GetSavedMovies = async () => {
       headers: URL_CONFIG.headers,
     });
 
+    const data = await response.json();
+
+    if(data.message == 'No movies found') {
+      return []
+    }
+
     if (!response.ok) {
+      console.log('response', data.message)
       throw new Error("Failed to fetch data");
     }
 
-    const data = await response.json();
 
     return data;
   } catch (err) {

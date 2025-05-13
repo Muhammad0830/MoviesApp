@@ -48,8 +48,7 @@ const saved = () => {
   useFocusEffect(
     useCallback(() => {
       refetch();
-      return () => {
-      };
+      return () => {};
     }, [])
   );
 
@@ -63,18 +62,6 @@ const saved = () => {
         />
       </View>
     );
-  }
-
-  if (!loading && !savedMovies) {
-    setTimeout(() => {
-      return (
-        <View className="flex-1 justify-center items-center bg-bg_primary">
-          <Text className="text-white text-[24px] font-bold">
-            No saved movies
-          </Text>
-        </View>
-      ); 
-    }, 1000)
   }
 
   return (
@@ -91,8 +78,7 @@ const saved = () => {
           justifyContent: "space-between",
           paddingHorizontal: 7,
         }}
-        style={{
-        }}
+        style={{}}
         ListHeaderComponent={
           <View>
             <Image source={images.bg} className="absolute w-full z-0" />
@@ -106,7 +92,7 @@ const saved = () => {
                   Saved Movies
                 </Text>
               </View>
-              <FlatList
+              {movies?.length > 0 ? (             <FlatList
                 data={movies}
                 horizontal
                 keyExtractor={(item: any) => item.id.toString()}
@@ -122,7 +108,11 @@ const saved = () => {
                   alignItems: "center",
                 }}
                 showsHorizontalScrollIndicator={false}
-              />
+              />) : (
+                <View className="h-60 justify-center items-center">
+                  <Text className="text-white text-[20px] font-bold">No movies saved</Text>
+                </View>
+              )}
               <View>
                 <Text className="text-white text-[24px] font-bold">
                   Recommended just for you

@@ -44,7 +44,7 @@ moviesRouter.get("/moviesDB/:id", async (req, res) => {
   }
 });
 
-moviesRouter.post("/moviesDB", async (req, res) => {
+moviesRouter.post("/savedMovies", async (req, res) => {
   try {
     const { id } = req.body;
 
@@ -85,6 +85,7 @@ moviesRouter.post("/moviesDB", async (req, res) => {
 
 moviesRouter.get("/savedMovies", async (req, res) => {
   try {
+    console.log('getting saved movies')
     const savedMovies = await db.query(`SELECT m.*
       FROM saved_movies sm
       JOIN movies m ON sm.movie_id = m.id
