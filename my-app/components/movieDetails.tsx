@@ -29,6 +29,7 @@ import MovieCard from "./movieCard";
 import { MovieType } from "@/types/MovieType";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "@/contexts/authContext";
 
 const MovieDetails = ({ movie }: any) => {
   const [movies, setMovies] = useState([]);
@@ -36,8 +37,8 @@ const MovieDetails = ({ movie }: any) => {
   const [shuffleMovies, setShuffleMovies] = useState([]);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { data, loading, error } = useFetch(() => fetchMovies({ query: "" }));
-
   const navigation = useNavigation();
+  const { user } = useAuth();
 
   const {
     data: saved_Movies,
@@ -45,7 +46,13 @@ const MovieDetails = ({ movie }: any) => {
     error: savedMoviesError,
     reset: resetSaved,
     refetch: refetchSaved,
-  } = useFetch(() => GetSavedMovies());
+  } = useFetch(() => GetSavedMovies(user?.id));
+
+  useEffect(() => {
+    if (user?.id) {
+      refetchSaved();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (data) {
@@ -73,10 +80,10 @@ const MovieDetails = ({ movie }: any) => {
 
   const handleSave = async (movie: MovieType) => {
     if (!isBookmarked) {
-      SaveMovie(movie);
+      SaveMovie({movieId: movie.id, userId: user?.id} as any);
       setIsBookmarked(!isBookmarked);
     } else {
-      DeleteFromSavedMovies(movie.id);
+      DeleteFromSavedMovies({id: movie.id, userId: user?.id} as any);
       setIsBookmarked(!isBookmarked);
     }
   };

@@ -16,10 +16,12 @@ import HorizontalMovieCard from "@/components/horizontalMovieCard";
 import MovieCard from "@/components/movieCard";
 import { images } from "@/constants/images";
 import { icons } from "@/constants/icons";
+import { useAuth } from "@/contexts/authContext";
 
 const saved = () => {
   const [savedMovies, setSavedMovies] = useState([]);
   const [recommendedMovies, setRecommendedMovies] = useState([]);
+  const { user } = useAuth();
 
   const {
     data: movies,
@@ -27,7 +29,13 @@ const saved = () => {
     error,
     reset,
     refetch,
-  } = useFetch(() => GetSavedMovies());
+  } = useFetch(() => GetSavedMovies(user?.id));
+
+  useEffect(() => {
+    if (user?.id) {
+      refetch();
+    }
+  }, [user]);
 
   const {
     data: Recommended_movies,
@@ -92,25 +100,29 @@ const saved = () => {
                   Saved Movies
                 </Text>
               </View>
-              {movies?.length > 0 ? (             <FlatList
-                data={movies}
-                horizontal
-                keyExtractor={(item: any) => item.id.toString()}
-                renderItem={({ item }: any) => (
-                  <View style={{ width: 150, height: 190, marginRight: 10 }}>
-                    <HorizontalMovieCard item={item} />
-                  </View>
-                )}
-                className="-translate-x-1 mb-2"
-                style={{ height: 200 }}
-                contentContainerStyle={{
-                  paddingHorizontal: 4,
-                  alignItems: "center",
-                }}
-                showsHorizontalScrollIndicator={false}
-              />) : (
+              {movies?.length > 0 ? (
+                <FlatList
+                  data={movies}
+                  horizontal
+                  keyExtractor={(item: any) => item.id.toString()}
+                  renderItem={({ item }: any) => (
+                    <View style={{ width: 150, height: 190, marginRight: 10 }}>
+                      <HorizontalMovieCard item={item} />
+                    </View>
+                  )}
+                  className="-translate-x-1 mb-2"
+                  style={{ height: 200 }}
+                  contentContainerStyle={{
+                    paddingHorizontal: 4,
+                    alignItems: "center",
+                  }}
+                  showsHorizontalScrollIndicator={false}
+                />
+              ) : (
                 <View className="h-60 justify-center items-center">
-                  <Text className="text-white text-[20px] font-bold">No movies saved</Text>
+                  <Text className="text-white text-[20px] font-bold">
+                    No movies saved
+                  </Text>
                 </View>
               )}
               <View>
