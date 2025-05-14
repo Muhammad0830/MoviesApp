@@ -42,12 +42,11 @@ export const fetchEachMovie = async ({ id }: { id: number }) => {
   }
 
   const data = await response.json();
-  console.log("fetched succesfully to the", endpoint);
 
   return data;
 };
 
-export const SaveMovie = async (movie: MovieType) => {
+export const SaveMovie = async ({movieId, userId}: {movieId: number, userId: number}) => {
   try {
     console.log("saving a movie...");
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
@@ -55,11 +54,10 @@ export const SaveMovie = async (movie: MovieType) => {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: URL_CONFIG.headers,
-      body: JSON.stringify(movie),
+      body: JSON.stringify({movieId, userId}),
     });
 
     const data = await response.json();
-    console.log("data", data.message);
 
     if (!response.ok) {
       Alert.alert("Error", data.message || "Failed to save a movie");
@@ -72,10 +70,11 @@ export const SaveMovie = async (movie: MovieType) => {
   }
 };
 
-export const GetSavedMovies = async () => {
+export const GetSavedMovies = async (id: any) => {
   try {
     console.log("getting saved movies...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
+    console.log('id user', id)
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}`;
     const response = await fetch(endpoint, {
       method: "GET",
       headers: URL_CONFIG.headers,
@@ -98,10 +97,12 @@ export const GetSavedMovies = async () => {
   }
 };
 
-export const DeleteFromSavedMovies = async (id: number) => {
+export const DeleteFromSavedMovies = async ({id, userId}: {id: number, userId: number}) => {
   try {
     console.log("deleting a movie...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}`;
+    console.log('id', id)
+    console.log('userId', userId)
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}/users/${userId}`;
     const response = await fetch(endpoint, {
       method: "DELETE",
       headers: URL_CONFIG.headers,
@@ -123,7 +124,6 @@ export const DeleteFromSavedMovies = async (id: number) => {
 export const GetUser = async (id: number) => {
   try {
     console.log("getting user...");
-    console.log('id', id)
     const endpoint = `${URL_CONFIG.BASE_URL}/users/user/${id}`;
     const token = await AsyncStorage.getItem("token");
     const response = await fetch(endpoint, {
