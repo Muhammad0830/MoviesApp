@@ -1,4 +1,5 @@
 import { MovieType } from "@/types/MovieType";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 
 export const URL_CONFIG = {
@@ -7,7 +8,7 @@ export const URL_CONFIG = {
   headers: {
     accept: "application/json",
     "Content-Type": "application/json",
-    authorization: `Bearer ${process.env.EXPO_PUBLIC_USER_SECRET_CODE}`,
+    authorization: `Bearer ${AsyncStorage.getItem("token")}`,
   },
 };
 
@@ -122,11 +123,12 @@ export const DeleteFromSavedMovies = async (id: number) => {
 export const GetUser = async (id: number) => {
   try {
     console.log("getting user...");
-    const endpoint = `${URL_CONFIG.BASE_URL}/users/user`;
-    console.log("endpoint", endpoint);
+    console.log('id', id)
+    const endpoint = `${URL_CONFIG.BASE_URL}/users/user/${id}`;
+    const token = await AsyncStorage.getItem("token");
     const response = await fetch(endpoint, {
       method: "GET",
-      headers: URL_CONFIG.headers,
+      headers: {...URL_CONFIG.headers, authorization: `Bearer ${token}` },
     });
 
     if (!response.ok) {
@@ -134,7 +136,6 @@ export const GetUser = async (id: number) => {
     }
 
     const data = await response.json();
-    console.log("data", data);
 
     return data;
   } catch (err) {

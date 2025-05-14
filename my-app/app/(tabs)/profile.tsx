@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { GetUser } from "@/services/api";
 import useFetch from "@/services/useFetch";
 import { useAuth } from "@/contexts/authContext";
@@ -10,14 +10,10 @@ import { icons } from "@/constants/icons";
 
 const profile = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [userData, setUserData] = useState<any>({});
 
-  if (!user) {
-    return <Text>Loading...</Text>; // or redirect if necessary
-  }
-
-  console.log("user", user);
+  console.log("user id", user?.id);
 
   const { data, loading, error, reset, refetch } = useFetch(() =>
     GetUser(user?.id as any)
@@ -25,13 +21,39 @@ const profile = () => {
 
   useEffect(() => {
     setUserData(data);
+    console.log("data", data);
   }, [data]);
+
+    useFocusEffect(
+      useCallback(() => {
+        refetch();
+        return () => {};
+      }, [])
+    );
+  
 
   const handleLogout = async () => {
     console.log("logout");
     await SecureStore.deleteItemAsync("token");
+    setUser(null); // Reset user state
     router.replace("(auth)/login" as any);
   };
+
+  // if (!user?.id) {
+  //   return (
+  //     <View className="bg-bg_primary flex-1 items-center justify-center">
+  //       <Text className="text-white text-[20px]">Loading ...</Text>
+  //     </View>
+  //   );
+  // }
+
+  if(loading) {
+    return (
+      <View className="flex-1 bg-bg_primary justify-center items-center">
+        <Text className="text-white">Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <View className="flex-1 bg-bg_primary px-4 ">
@@ -42,7 +64,9 @@ const profile = () => {
           className="absolute mx-auto w-12 h-10 mt-10 mb-5"
         />
       </View>
-      <Text className="text-white text-[24px] mt-10 mb-14 font-bold">Profile</Text>
+      <Text className="text-white text-[24px] mt-10 mb-14 font-bold">
+        Profile
+      </Text>
 
       <View className="justify-center">
         <Text className="text-white text-[14px]">

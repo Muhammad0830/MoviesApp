@@ -3,11 +3,13 @@ const db = require("../db");
 const jwt = require("jsonwebtoken");
 const { authenticate } = require("../utils/middleware");
 
-userRouter.get("/user", async (req, res) => {
+userRouter.get("/user/:id", authenticate, async (req, res) => {
   console.log("getting a user");
+  const id = req.params.id;
+  console.log('id', id)
   try {
     const user = await db.query(
-      `Select * from users;`
+      `Select * from users where id = ${id}`
     );
     console.log("user", user[0]);
     if (user[0].length > 0) {

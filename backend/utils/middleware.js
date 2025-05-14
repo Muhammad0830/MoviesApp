@@ -3,14 +3,18 @@ const jwt = require("jsonwebtoken");
 
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
+  console.log('authHeader', authHeader)
   if (!authHeader) return res.sendStatus(401);
 
   const token = authHeader.split(" ")[1];
+  console.log('token', token)
+  console.log(process.env.JWT_SECRET_CODE)
   try {
-    const user = jwt.verify(token, "your_jwt_secret");
+    const user = jwt.verify(token, process.env.JWT_SECRET_CODE);
     req.user = user;
     next();
-  } catch {
+  } catch (err) {
+    console.error('error', err.message)
     res.sendStatus(403);
   }
 };

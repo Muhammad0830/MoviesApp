@@ -1,9 +1,10 @@
 import { View, Text, ImageBackground, Image } from "react-native";
-import React from "react";
-import { Tabs } from "expo-router";
+import React, { useEffect } from "react";
+import { router, Tabs, useRootNavigationState } from "expo-router";
 import { images } from "@/constants/images";
 import { icons } from "@/constants/icons";
 import highlight from "@/assets/images/highlight.png";
+import { useAuth } from "@/contexts/authContext";
 
 const TabIcon = ({ focused, text, icon }: any) => {
   return focused ? (
@@ -18,12 +19,27 @@ const TabIcon = ({ focused, text, icon }: any) => {
     </ImageBackground>
   ) : (
     <View className="flex flex-col size-full min-h-16 mt-4 flex-1 justify-center items-center rounded-full overflow-hidden">
-      <Image source={icon} tintColor={'#f2f3f5'} className="size-5" />
+      <Image source={icon} tintColor={"#f2f3f5"} className="size-5" />
     </View>
   );
 };
 
 const _layout = () => {
+  // const { user } = useAuth();
+  // const rootNavigation = useRootNavigationState();
+
+  // useEffect(() => {
+  //   // Wait until the navigation system is fully mounted
+  //   if (!rootNavigation?.key) return;
+
+  //   if (!user?.id) {
+  //     router.replace("/(auth)/login");
+  //   }
+  // }, [user, rootNavigation]);
+
+  // if (!rootNavigation?.key || !user?.id) return null;
+  // console.log("user auth", user?.id);
+
   return (
     <Tabs
       screenOptions={{
