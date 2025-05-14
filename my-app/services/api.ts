@@ -1,5 +1,6 @@
 import { MovieType } from "@/types/MovieType";
-import { Alert } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 
 export const URL_CONFIG = {
   BASE_URL: process.env.EXPO_PUBLIC_MOVIE_API_URL,
@@ -7,7 +8,7 @@ export const URL_CONFIG = {
   headers: {
     accept: "application/json",
     "Content-Type": "application/json",
-    // authorization: 'Bearer <your-token-here>',
+    authorization: `Bearer ${AsyncStorage.getItem("token")}`,
   },
 };
 
@@ -50,7 +51,7 @@ export const SaveMovie = async (movie: MovieType) => {
   try {
     console.log("saving a movie...");
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
-    console.log('endpoint', endpoint)
+    console.log("endpoint", endpoint);
     const response = await fetch(endpoint, {
       method: "POST",
       headers: URL_CONFIG.headers,
@@ -61,10 +62,9 @@ export const SaveMovie = async (movie: MovieType) => {
     console.log("data", data.message);
 
     if (!response.ok) {
-      Alert.alert("Error", data.message || 'Failed to save a movie');
+      Alert.alert("Error", data.message || "Failed to save a movie");
       throw new Error("Failed to fetch data");
     }
-
 
     return data;
   } catch (err) {
@@ -77,27 +77,26 @@ export const GetSavedMovies = async () => {
     console.log("getting saved movies...");
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
     const response = await fetch(endpoint, {
-      method: 'GET',
+      method: "GET",
       headers: URL_CONFIG.headers,
     });
 
     const data = await response.json();
 
-    if(data.message == 'No movies found') {
-      return []
+    if (data.message == "No movies found") {
+      return [];
     }
 
     if (!response.ok) {
-      console.log('response', data.message)
+      console.log("response", data.message);
       throw new Error("Failed to fetch data");
     }
 
-
     return data;
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
-}
+};
 
 export const DeleteFromSavedMovies = async (id: number) => {
   try {
@@ -106,17 +105,40 @@ export const DeleteFromSavedMovies = async (id: number) => {
     const response = await fetch(endpoint, {
       method: "DELETE",
       headers: URL_CONFIG.headers,
-    })
+    });
 
-    if(!response.ok) {
+    if (!response.ok) {
       throw new Error("Failed to delete a movie");
     }
 
     const data = await response.json();
     console.log("deleted succesfully to the", endpoint);
-    
+
     return data;
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
-}
+};
+
+export const GetUser = async (id: number) => {
+  try {
+    console.log("getting user...");
+    console.log('id', id)
+    const endpoint = `${URL_CONFIG.BASE_URL}/users/user/${id}`;
+    const token = await AsyncStorage.getItem("token");
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {...URL_CONFIG.headers, authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};

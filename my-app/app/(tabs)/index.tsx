@@ -8,7 +8,7 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import { Link, useFocusEffect } from "expo-router";
+import { Link, useFocusEffect, useRootNavigationState } from "expo-router";
 import { images } from "@/constants/images";
 import { icons } from "@/constants/icons";
 import SearchBar from "@/components/searchBar";
@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
 import MovieCard from "@/components/movieCard";
+import { useAuth } from "@/contexts/authContext";
 
 export default function Index() {
   const router = useRouter();
@@ -49,8 +50,7 @@ export default function Index() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-      return () => {
-      };
+      return () => {};
     }, [])
   );
 
