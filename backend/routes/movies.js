@@ -89,13 +89,7 @@ moviesRouter.get("/savedMovies/:id", async (req, res) => {
   try {
     console.log("getting saved movies");
     const id = req.params.id
-    console.log('id', id)
-    // const savedMovies = await db.query(`SELECT m.*
-    //   FROM saved_movies sm
-    //   JOIN movies m ON sm.movie_id = m.id
-    //   ORDER BY sm.saved_at DESC;
-    // `);
-
+    
     const savedMovies =
       await db.query(`select sm.id, sm.movie_id, us.username, m.*
                         from saved_movies as sm
