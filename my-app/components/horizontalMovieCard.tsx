@@ -13,7 +13,7 @@ const HorizontalMovieCard = ({ item, gap, index }: any) => {
           className={`rounded-md h-full border border-primary/40 flex flex-col overflow-hidden`}
           style={{ marginHorizontal: gap }}
         >
-          <View className="absolute w-7 h-7 top-1 left-1 z-10 rounded-full bg-secondary border border-black/70 items-center justify-center">
+          <View className="absolute w-7 h-7 top-1 left-1 z-10 rounded-full bg-primaryDarker border border-black/70 items-center justify-center">
             <Text className="text-white text-[14px] font-bold">{index + 1}</Text>
           </View>
           <Image

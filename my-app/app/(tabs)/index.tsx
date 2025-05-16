@@ -13,7 +13,7 @@ import { images } from "@/constants/images";
 import { icons } from "@/constants/icons";
 import SearchBar from "@/components/searchBar";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
 import MovieCard from "@/components/movieCard";
@@ -39,7 +39,9 @@ export default function Index() {
 
   useEffect(() => {
     setFilteredData(movies);
-    const sorted = movies?.sort((a: any, b: any) => b.score - a.score).slice(0, 10);
+    const sorted = movies
+      ?.sort((a: any, b: any) => b.score - a.score)
+      .slice(0, 10);
     setTopRated(sorted);
   }, [movies]);
 
@@ -130,7 +132,7 @@ export default function Index() {
                 keyExtractor={(item: any) => item.id}
                 renderItem={({ item, index }: any) => (
                   <View style={{ width: 150, height: 190, marginRight: 10 }}>
-                    <HorizontalMovieCard item={item} index={index}/>
+                    <HorizontalMovieCard item={item} index={index} />
                   </View>
                 )}
                 horizontal

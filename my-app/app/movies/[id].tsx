@@ -49,7 +49,6 @@ const movieDetails = () => {
       ) : movie ? (
         <MovieDetails movie={movie} />
       ) : (
-        // <TestAnimation />
         <View className="h-screen justify-center items-center">
           <Text>{error?.message}</Text>
         </View>

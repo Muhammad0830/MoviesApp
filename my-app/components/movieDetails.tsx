@@ -30,6 +30,10 @@ import { MovieType } from "@/types/MovieType";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/contexts/authContext";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 const MovieDetails = ({ movie }: any) => {
   const [movies, setMovies] = useState([]);
@@ -80,13 +84,29 @@ const MovieDetails = ({ movie }: any) => {
 
   const handleSave = async (movie: MovieType) => {
     if (!isBookmarked) {
-      SaveMovie({movieId: movie.id, userId: user?.id} as any);
+      SaveMovie({ movieId: movie.id, userId: user?.id } as any);
       setIsBookmarked(!isBookmarked);
     } else {
-      DeleteFromSavedMovies({id: movie.id, userId: user?.id} as any);
+      DeleteFromSavedMovies({ id: movie.id, userId: user?.id } as any);
       setIsBookmarked(!isBookmarked);
     }
   };
+
+  const snapPoints = useMemo(() => ["40%", "75%"], []);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const handleSheetOpen = () => bottomSheetRef.current?.snapToIndex(0);
+  const handleSheetClose = () => bottomSheetRef.current?.close();
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        {...props}
+      />
+    ),
+    []
+  );
 
   if (loading) {
     return (
@@ -188,9 +208,7 @@ const MovieDetails = ({ movie }: any) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              onPress={() => {}} // Toggle the BottomSheet expansion
-            >
+            <TouchableOpacity onPress={handleSheetOpen}>
               <View className="pt-2 pb-8 px-3 rounded-md bg-black/30 border border-white/50 gap-4">
                 <Text className="text-white text-[12px] font-bold">
                   {movie.genre ? movie.genre.join(", ") : null}
@@ -214,8 +232,35 @@ const MovieDetails = ({ movie }: any) => {
             </View>
           </View>
         }
-        ListFooterComponent={<View></View>}
       />
+
+      <BottomSheet
+        index={-1}
+        snapPoints={snapPoints}
+        ref={bottomSheetRef}
+        enablePanDownToClose={true}
+        backdropComponent={renderBackdrop}
+        handleIndicatorStyle={{ backgroundColor: "#8a5fed" }}
+        backgroundStyle={{ backgroundColor: "#222222" }}
+      >
+        <BottomSheetView style={{ flex: 1, paddingInline: 20, paddingTop: 10 }}>
+          <Text className="text-white text-[14px]">
+            <Text className="text-white font-bold">Genre: </Text>{movie.genre.join(", ")}
+          </Text>
+          <Text className="text-white text-[12px] mt-2">
+            {movie.description}
+          </Text>
+
+          {/* <View className="w-full flex-row justify-end mt-4">
+            <TouchableOpacity
+              onPress={handleSheetClose}
+              className="p-3 rounded-lg bg-red-500"
+            >
+              <Text className="text-white text-[12px] font-bold">Close</Text>
+            </TouchableOpacity>
+          </View> */}
+        </BottomSheetView>
+      </BottomSheet>
     </View>
   );
 };
