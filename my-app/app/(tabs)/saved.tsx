@@ -105,9 +105,9 @@ const saved = () => {
                   data={movies}
                   horizontal
                   keyExtractor={(item: any) => item.id.toString()}
-                  renderItem={({ item }: any) => (
+                  renderItem={({ item, index }: any) => (
                     <View style={{ width: 150, height: 190, marginRight: 10 }}>
-                      <HorizontalMovieCard item={item} />
+                      <HorizontalMovieCard item={item} index={index}/>
                     </View>
                   )}
                   className="-translate-x-1 mb-2"
