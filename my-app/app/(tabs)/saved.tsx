@@ -1,13 +1,10 @@
 import {
   ActivityIndicator,
-  StyleSheet,
   Text,
   View,
-  SectionList,
-  Dimensions,
   Image,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchMovies, GetSavedMovies } from "@/services/api";
 import useFetch from "@/services/useFetch";
 import { useFocusEffect } from "expo-router";
@@ -107,7 +104,7 @@ const saved = () => {
                   keyExtractor={(item: any) => item.id.toString()}
                   renderItem={({ item, index }: any) => (
                     <View style={{ width: 150, height: 190, marginRight: 10 }}>
-                      <HorizontalMovieCard item={item} index={index}/>
+                      <HorizontalMovieCard item={item} index={index} />
                     </View>
                   )}
                   className="-translate-x-1 mb-2"
