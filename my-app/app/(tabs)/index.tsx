@@ -18,6 +18,7 @@ import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
 import MovieCard from "@/components/movieCard";
 import { useAuth } from "@/contexts/authContext";
+import HorizontalMovieCard from "@/components/horizontalMovieCard";
 
 export default function Index() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [filteredData, setFilteredData] = useState([]);
+  const [topRated, setTopRated] = useState([]);
 
   const {
     data: movies,
@@ -37,6 +39,8 @@ export default function Index() {
 
   useEffect(() => {
     setFilteredData(movies);
+    const sorted = movies?.sort((a: any, b: any) => b.score - a.score).slice(0, 10);
+    setTopRated(sorted);
   }, [movies]);
 
   useEffect(() => {
@@ -115,6 +119,28 @@ export default function Index() {
                   value=""
                   onChangeText={(text: string) => setQuery(text)}
                 />
+              </View>
+              <View className="mb-2">
+                <Text className="text-white text-[20px] font-bold">
+                  Top Rated
+                </Text>
+              </View>
+              <FlatList
+                data={topRated}
+                keyExtractor={(item: any) => item.id}
+                renderItem={({ item, index }: any) => (
+                  <View style={{ width: 150, height: 190, marginRight: 10 }}>
+                    <HorizontalMovieCard item={item} index={index}/>
+                  </View>
+                )}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="mb-2"
+              />
+              <View className="mt-2">
+                <Text className="text-white font-bold text-[20px]">
+                  Recommended Movies
+                </Text>
               </View>
             </View>
           }
