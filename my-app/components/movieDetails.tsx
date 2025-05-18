@@ -11,6 +11,9 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Modal,
+  Button,
+  StyleSheet,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -43,6 +46,7 @@ const MovieDetails = ({ movie }: any) => {
   const { data, loading, error } = useFetch(() => fetchMovies({ query: "" }));
   const navigation = useNavigation();
   const { user } = useAuth();
+  const [visible, setVisible] = useState(false);
 
   const {
     data: saved_Movies,
@@ -82,16 +86,6 @@ const MovieDetails = ({ movie }: any) => {
     return arr.sort(() => Math.random() - 0.5);
   };
 
-  const handleSave = async (movie: MovieType) => {
-    if (!isBookmarked) {
-      SaveMovie({ movieId: movie.id, userId: user?.id } as any);
-      setIsBookmarked(!isBookmarked);
-    } else {
-      DeleteFromSavedMovies({ id: movie.id, userId: user?.id } as any);
-      setIsBookmarked(!isBookmarked);
-    }
-  };
-
   const snapPoints = useMemo(() => ["40%", "75%"], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleSheetOpen = () => bottomSheetRef.current?.snapToIndex(0);
@@ -129,7 +123,49 @@ const MovieDetails = ({ movie }: any) => {
   }
 
   return (
-    <View className="w-full flex-1 bg-bg_primary">
+    <View className="w-full flex-1 items-center bg-bg_primary">
+      <View className="absolute top-0 left-0">
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
+        >
+          <View style={styles.modalOverlay} className="justify-center flex-1">
+            <View className="w-[80%] mx-auto p-5 rounded-lg elevation-lg bg-white">
+              <View className="mb-2">
+                <Text className="text-bg_primary text-[16px] font-bold">
+                  Delete from Saved movies?
+                </Text>
+              </View>
+              <View className="w-full flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-bg_primary rounded-lg py-2 px-4"
+                  onPress={() => {
+                    setVisible(false);
+                  }}
+                >
+                  <Text className="text-white text-[16px]">Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-primaryDarker rounded-lg py-2 px-4"
+                  onPress={() => {
+                    DeleteFromSavedMovies({
+                      id: movie.id,
+                      userId: user?.id,
+                    } as any);
+                    setIsBookmarked(!isBookmarked);
+                    setVisible(false);
+                  }}
+                >
+                  <Text className="text-white text-[16px]">Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+
       <FlatList
         data={shuffleMovies}
         renderItem={({ item }: any) => (
@@ -196,7 +232,12 @@ const MovieDetails = ({ movie }: any) => {
               </View>
               <TouchableOpacity
                 onPress={() => {
-                  handleSave(movie as MovieType);
+                  if (!isBookmarked) {
+                    SaveMovie({ movieId: movie.id, userId: user?.id } as any);
+                    setIsBookmarked(!isBookmarked);
+                  } else {
+                    setVisible(true);
+                  }
                 }}
                 className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
               >
@@ -245,7 +286,8 @@ const MovieDetails = ({ movie }: any) => {
       >
         <BottomSheetView style={{ flex: 1, paddingInline: 20, paddingTop: 10 }}>
           <Text className="text-white text-[14px]">
-            <Text className="text-white font-bold">Genre: </Text>{movie.genre.join(", ")}
+            <Text className="text-white font-bold">Genre: </Text>
+            {movie.genre.join(", ")}
           </Text>
           <Text className="text-white text-[12px] mt-2">
             {movie.description}
@@ -261,8 +303,38 @@ const MovieDetails = ({ movie }: any) => {
           </View> */}
         </BottomSheetView>
       </BottomSheet>
+
+      {/* <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isOpen}
+        onRequestClose={() => setIsOpen((prev) => !prev)}
+        className="flex-1 justify-center items-center"
+      >
+        <View className="bg-red-500 flex-1 w-full justify-center py-10">
+          <View className="bg-white rounded-lg p-10">
+            <Text>this is modal</Text>
+            <Button title="Close" onPress={() => setIsOpen((prev) => !prev)} />
+          </View>
+        </View>
+      </Modal> */}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  modalContent: {
+    margin: 20,
+    backgroundColor: "white",
+    padding: 25,
+    borderRadius: 10,
+    elevation: 5,
+  },
+});
 
 export default MovieDetails;
