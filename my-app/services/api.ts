@@ -46,7 +46,13 @@ export const fetchEachMovie = async ({ id }: { id: number }) => {
   return data;
 };
 
-export const SaveMovie = async ({movieId, userId}: {movieId: number, userId: number}) => {
+export const SaveMovie = async ({
+  movieId,
+  userId,
+}: {
+  movieId: number;
+  userId: number;
+}) => {
   try {
     console.log("saving a movie...");
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
@@ -54,7 +60,7 @@ export const SaveMovie = async ({movieId, userId}: {movieId: number, userId: num
     const response = await fetch(endpoint, {
       method: "POST",
       headers: URL_CONFIG.headers,
-      body: JSON.stringify({movieId, userId}),
+      body: JSON.stringify({ movieId, userId }),
     });
 
     const data = await response.json();
@@ -73,7 +79,7 @@ export const SaveMovie = async ({movieId, userId}: {movieId: number, userId: num
 export const GetSavedMovies = async (id: any) => {
   try {
     console.log("getting saved movies...");
-    console.log('id user', id)
+    console.log("id user", id);
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}`;
     const response = await fetch(endpoint, {
       method: "GET",
@@ -97,11 +103,17 @@ export const GetSavedMovies = async (id: any) => {
   }
 };
 
-export const DeleteFromSavedMovies = async ({id, userId}: {id: number, userId: number}) => {
+export const DeleteFromSavedMovies = async ({
+  id,
+  userId,
+}: {
+  id: number;
+  userId: number;
+}) => {
   try {
     console.log("deleting a movie...");
-    console.log('id', id)
-    console.log('userId', userId)
+    console.log("id", id);
+    console.log("userId", userId);
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}/users/${userId}`;
     const response = await fetch(endpoint, {
       method: "DELETE",
@@ -128,7 +140,7 @@ export const GetUser = async (id: number) => {
     const token = await AsyncStorage.getItem("token");
     const response = await fetch(endpoint, {
       method: "GET",
-      headers: {...URL_CONFIG.headers, authorization: `Bearer ${token}` },
+      headers: { ...URL_CONFIG.headers, authorization: `Bearer ${token}` },
     });
 
     if (!response.ok) {
@@ -138,6 +150,35 @@ export const GetUser = async (id: number) => {
     const data = await response.json();
 
     return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const GetSearchMovies = async (options: any = {}) => {
+  try {
+    const params = new URLSearchParams(options).toString();
+    console.log("params", options);
+    const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesSearch?${params}`;
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: URL_CONFIG.headers,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+    
+    console.log(
+      "data",
+      data.movies?.map((item: any) => {
+        return { id: item.id, title: item.title, score: item.score };
+      })
+    );
+
+    return data.movies;
   } catch (err) {
     console.error(err);
   }
