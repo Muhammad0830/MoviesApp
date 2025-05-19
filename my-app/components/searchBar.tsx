@@ -1,17 +1,27 @@
-import { View, Text, Image, TextInput } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import React from "react";
 import { icons } from "@/constants/icons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 interface Props {
-    placeholder: string;
-    onPress?: () => void;
-    value: string;
-    onChangeText: (text: string) => void;
+  placeholder: string;
+  onPress?: () => void;
+  value: string;
+  onChangeText: (text: string) => void;
+  optionsOnPress?: () => void;
+  page?: string;
 }
 
-const searchBar = ({ placeholder, onPress, value, onChangeText }: Props) => {
+const searchBar = ({
+  placeholder,
+  onPress,
+  value,
+  onChangeText,
+  optionsOnPress,
+  page,
+}: Props) => {
   return (
-    <View className="flex-row items-center bg-dark-200 rounded-full px-5 py-2">
+    <View className="w-full flex-row items-center justify-between bg-dark-200 rounded-full px-4 py-1">
       <Image
         source={icons.search}
         className="size-5"
@@ -20,12 +30,20 @@ const searchBar = ({ placeholder, onPress, value, onChangeText }: Props) => {
       />
       <TextInput
         onPress={onPress}
-        placeholder={placeholder} 
+        placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
-        placeholderTextColor={'#a9b5db'}
-        className="flex-1 ml-2 text-white"
+        placeholderTextColor={"#a9b5db"}
+        className="flex-1 mx-2 h-12 text-white"
       />
+      {page === "search" ? (
+        <TouchableOpacity
+          className="border border-primaryDarker h-[30px] aspect-square rounded-full justify-center items-center"
+          onPress={optionsOnPress}
+        >
+          <FontAwesome name="bars" size={15} color="#8a5fed" />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };

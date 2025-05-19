@@ -47,7 +47,7 @@ moviesRouter.get("/moviesDB/:id", async (req, res) => {
 moviesRouter.post("/savedMovies", async (req, res) => {
   try {
     const { movieId, userId } = req.body;
-    console.log('svaing a movie to the user...')
+    console.log("svaing a movie to the user...");
 
     if (!movieId || !userId) {
       return res.status(400).json({ error: "id is required" });
@@ -88,8 +88,8 @@ moviesRouter.post("/savedMovies", async (req, res) => {
 moviesRouter.get("/savedMovies/:id", async (req, res) => {
   try {
     console.log("getting saved movies");
-    const id = req.params.id
-    
+    const id = req.params.id;
+
     const savedMovies =
       await db.query(`select sm.id, sm.movie_id, us.username, m.*
                         from saved_movies as sm
@@ -107,9 +107,77 @@ moviesRouter.get("/savedMovies/:id", async (req, res) => {
   }
 });
 
+// filtering for search page
+moviesRouter.get("/moviesSearch", async (req, res) => {
+  try {
+    // 1️⃣ Read query params (with defaults)
+    const {
+      search = "",
+      sortBy = "id",
+      order = "DESC",
+      genre = "",
+      limit = 10,
+      page = 1,
+      minRating = 0, // 👈 NEW
+      minViews = 0, // 👈 OPTIONAL
+      minFavorites = 0, // 👈 OPTIONAL
+    } = req.query;
+    console.log('sortBy', sortBy)
+
+    const offset = (page - 1) * limit;
+
+    let sql = `SELECT * FROM movies WHERE 1`;
+    const params = [];
+
+    if (search) {
+      sql += ` AND LOWER(title) LIKE ?`;
+      params.push(`%${search.toLowerCase()}%`);
+    }
+
+    if (genre) {
+      sql += ` AND genre = ?`;
+      params.push(genre);
+    }
+
+    if (Number(minRating)) {
+      sql += ` AND score >= ?`;
+      params.push(Number(minRating));
+    }
+
+    if (Number(minViews)) {
+      console.log('min Views working', typeof minViews)
+      sql += ` AND views >= ?`;
+      params.push(Number(minViews));
+    }
+
+    if (Number(minFavorites)) {
+      sql += ` AND favorites >= ?`;
+      params.push(Number(minFavorites));
+    }
+
+    // Sorting and pagination (same as before)
+    const allowedSortColumns = ["score", "views", "favorites", "scoret", "id"];
+    if (!allowedSortColumns.includes(sortBy)) {
+      return res.status(400).json({ error: "Invalid sortBy field." });
+    }
+    const dir = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    sql += ` ORDER BY \`${sortBy}\` ${dir}`;
+
+    sql += ` LIMIT ? OFFSET ?`;
+    params.push(Number(limit), Number(offset));
+
+    // 7️⃣ Execute
+    const [movies] = await db.query(sql, params);
+    res.json({ movies });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 moviesRouter.delete("/savedMovies/:movieId/users/:userId", async (req, res) => {
   try {
-    console.log('deleting a saved movie...')
+    console.log("deleting a saved movie...");
     const { movieId, userId } = req.params;
 
     if (!movieId || !userId) {
@@ -120,7 +188,9 @@ moviesRouter.delete("/savedMovies/:movieId/users/:userId", async (req, res) => {
       `Select * from saved_movies where movie_id = ${movieId} and user_id = ${userId};`
     );
     if (savedMovies[0].length > 0) {
-      await db.query(`Delete from saved_movies where movie_id = ${movieId} and user_id = ${userId};`);
+      await db.query(
+        `Delete from saved_movies where movie_id = ${movieId} and user_id = ${userId};`
+      );
       return res.status(200).json({ message: "deleted successfully" });
     } else {
       return res.status(404).json({ message: "No movies found" });
