@@ -5,8 +5,10 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Animated,
+  Easing,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import SearchBar from "@/components/searchBar";
 import { images } from "@/constants/images";
 import MovieCard from "@/components/movieCard";
@@ -14,6 +16,9 @@ import useFetch from "@/services/useFetch";
 import { GetSearchMovies } from "@/services/api";
 import { useFocusEffect } from "expo-router";
 import debounce from "lodash.debounce";
+import { Dimensions } from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 const defaultParams = {
   search: "",
@@ -31,8 +36,9 @@ const search = () => {
   const [searchMovies, setSearchMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState("all");
+  const [selected, setSelected] = useState("All");
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const {
     data,
@@ -51,7 +57,7 @@ const search = () => {
   }, [data]);
 
   const handleFilter = (filterOptions = {}) => {
-    refetchSearchMovies({ ...filterOptions, page: page, order: "ASC" });
+    refetchSearchMovies({ ...filterOptions, page: page});
   };
 
   useFocusEffect(
@@ -88,6 +94,17 @@ const search = () => {
     }
   }, []);
 
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: isOpen ? 0 : -350,
+      duration: 200,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [isOpen]);
+
   return (
     <View className="flex-1 bg-bg_primary">
       <Image
@@ -97,7 +114,7 @@ const search = () => {
       />
 
       <FlatList
-        data={loading ? [] : searchMovies}
+        data={!loading && (isOpen || searchQuery !== "") ? searchMovies : []}
         renderItem={({ item }: any) => (
           <MovieCard gridNum={2} item={item} gap={15 as number} />
         )}
@@ -124,25 +141,31 @@ const search = () => {
                 }}
                 page="search"
                 optionsOnPress={() => {
-                  console.log("working");
+                  setIsOpen(!isOpen);
                 }}
               />
             </View>
 
-            <View className="mb-4">
+            <Animated.View
+              className="-z-10"
+              style={{
+                transform: [{ translateY: -50 }, { translateX: translateY }],
+                width: width * 0.75,
+              }}
+            >
               <View className="flex-row gap-3 items-center">
                 <TouchableOpacity
                   className={`border border-primary px-2 py-1 rounded-md ${
-                    selected === "topRated" ? "bg-primary" : ""
+                    selected === "Top Rated" ? "bg-primary" : ""
                   }`}
                   onPress={() => {
                     handleFilter({ sortBy: "score", order: "DESC" });
-                    setSelected("topRated");
+                    setSelected("Top Rated");
                   }}
                 >
                   <Text
                     className={`text-[12px] ${
-                      selected === "topRated" ? "text-black" : "text-primary"
+                      selected === "Top Rated" ? "text-black" : "text-primary"
                     }`}
                   >
                     Top rated
@@ -150,23 +173,23 @@ const search = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   className={`border border-primary px-2 py-1 rounded-md ${
-                    selected === "all" ? "bg-primary" : ""
+                    selected === "All" ? "bg-primary" : ""
                   }`}
                   onPress={() => {
                     refetchSearchMovies(defaultParams);
-                    setSelected("all");
+                    setSelected("All");
                   }}
                 >
                   <Text
                     className={`text-[12px] ${
-                      selected === "all" ? "text-black" : "text-primary"
+                      selected === "All" ? "text-black" : "text-primary"
                     }`}
                   >
                     All
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </Animated.View>
 
             {loading ? (
               <View className="flex-1 justify-center items-center">
@@ -187,6 +210,10 @@ const search = () => {
                   </Text>
                 </Text>
               </View>
+            ) : isOpen ? (
+              <View className="mb-2">
+                <Text className="text-white text-[20px] font-bold">{selected} movies</Text>
+              </View>
             ) : (
               <View>
                 <Text className="text-white self-center">
@@ -198,11 +225,13 @@ const search = () => {
         }
         ListFooterComponent={
           <View className="flex-1 flex-row justify-center items-center mt-3">
-            {!loading && searchMovies?.length > 0 ? (
+            {!loading &&
+            (isOpen || searchQuery !== "") &&
+            searchMovies?.length >= 10 ? (
               <TouchableOpacity
                 className="bg-primaryDarker rounded-lg py-2 px-4"
                 onPress={() => {
-                  loadMovies({ page: page + 1 });
+                  loadMovies({ page: page + 1, search: searchQuery });
                   setPage(page + 1);
                 }}
               >
