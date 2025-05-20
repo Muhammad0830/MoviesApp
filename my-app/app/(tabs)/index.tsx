@@ -114,7 +114,7 @@ export default function Index() {
                 source={icons.logo}
                 className="w-12 h-10 mt-10 mb-5 mx-auto"
               />
-              <View className="mt-5 mb-5 px-2">
+              <View className="mt-5 mb-5 px-2 flex-row items-center justify-center">
                 <SearchBar
                   onPress={() => router.push("/search")}
                   placeholder="Search for a movie"
