@@ -23,7 +23,7 @@ const { width, height } = Dimensions.get("window");
 const defaultParams = {
   search: "",
   sortBy: "id",
-  order: "ASC",
+  order: "DESC",
   genre: "",
   limit: 10,
   page: 1,
@@ -39,6 +39,12 @@ const search = () => {
   const [selected, setSelected] = useState("All");
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    offset: 0,
+    total: 0,
+  });
 
   const {
     data,
@@ -46,15 +52,16 @@ const search = () => {
     error: searchMoviesError,
     refetch: refetchSearchMovies,
     reset: resetSearchMovies,
-  } = useFetch(GetSearchMovies, { order: "ASC" });
+  } = useFetch(GetSearchMovies, { order: "DESC" });
+
+  useEffect(() => {
+    setSearchMovies(data?.movies);
+    setPagination(data?.pagination);
+  }, [data]);
 
   const handleSearch = debounce((text: string) => {
     refetchSearchMovies({ search: text, page: 1 });
   }, 300);
-
-  useEffect(() => {
-    setSearchMovies(data);
-  }, [data]);
 
   const handleFilter = (filterOptions = {}) => {
     refetchSearchMovies(filterOptions);
@@ -79,14 +86,9 @@ const search = () => {
   const loadMovies = useCallback(async (params: any) => {
     setLoading(true);
     try {
-      const results = await GetSearchMovies(params);
-      if (params.page === 1) {
-        // First page — replace movies
-        setSearchMovies(results);
-      } else {
-        // Append next page results
-        setSearchMovies((prev: any) => [...prev, ...results] as any);
-      }
+      const data = await GetSearchMovies(params);
+      const results = data?.movies;
+      setSearchMovies(results);
     } catch (err) {
       console.error(err);
     } finally {
@@ -100,8 +102,10 @@ const search = () => {
     if (!isOpen) {
       refetchSearchMovies(defaultParams);
       setSelected("All");
+    } else {
+      setPage(1);
+      setSearchQuery("");
     }
-
     Animated.timing(translateY, {
       toValue: isOpen ? 0 : -350,
       duration: 200,
@@ -183,6 +187,7 @@ const search = () => {
                   }`}
                   onPress={() => {
                     refetchSearchMovies(defaultParams);
+                    setPage(1);
                     setSelected("All");
                   }}
                 >
@@ -232,21 +237,103 @@ const search = () => {
           </View>
         }
         ListFooterComponent={
-          <View className="flex-1 flex-row justify-center items-center mt-3">
-            {!loading &&
-            (isOpen || searchQuery !== "") &&
-            searchMovies?.length >= 10 ? (
-              <TouchableOpacity
-                className="bg-primaryDarker rounded-lg py-2 px-4"
-                onPress={() => {
-                  loadMovies({ page: page + 1, search: searchQuery, sortBy: selected === "all" ? "id" : selected === "Top Rated" ? "score" : "id" });
-                  setPage(page + 1);
-                }}
-              >
-                <Text className="text-black text-[16px] font-bold">
-                  Load More
-                </Text>
-              </TouchableOpacity>
+          <View className="flex-1 px-[10px] flex-row justify-end items-center mt-3">
+            {!loading && (isOpen || searchQuery !== "") ? (
+              <View className="flex-row gap-2 items-center">
+                <TouchableOpacity
+                  disabled={page === 1}
+                  className={`${
+                    page === 1 ? "bg-primary/40" : "bg-primaryDarker"
+                  } rounded-md py-1.5 px-3`}
+                  onPress={() => {
+                    loadMovies({
+                      page: page - 1,
+                      search: searchQuery,
+                      sortBy:
+                        selected === "all"
+                          ? "id"
+                          : selected === "Top Rated"
+                          ? "score"
+                          : "id",
+                    });
+                    setPage(page - 1);
+                  }}
+                >
+                  <Text className="text-black text-[12px] font-bold">
+                    Previous
+                  </Text>
+                </TouchableOpacity>
+                {page !== 1 ? (
+                  <TouchableOpacity
+                    className="bg-primaryDarker rounded-md py-1.5 px-3"
+                    onPress={() => {
+                      loadMovies({
+                        page: 1,
+                        search: searchQuery,
+                        sortBy:
+                          selected === "all"
+                            ? "id"
+                            : selected === "Top Rated"
+                            ? "score"
+                            : "id",
+                      });
+                      setPage(1);
+                    }}
+                  >
+                    <Text className="text-black text-[12px] font-bold">1</Text>
+                  </TouchableOpacity>
+                ) : null}
+                <View className="bg-primary/40 rounded-md py-1.5 px-3">
+                  <Text className="text-black text-[12px] font-bold">
+                    {page}
+                  </Text>
+                </View>
+                {page < pagination.total / pagination.limit ? (
+                  <TouchableOpacity
+                    className="bg-primaryDarker rounded-md py-1.5 px-3"
+                    onPress={() => {
+                      loadMovies({
+                        page: Math.ceil(pagination.total / pagination.limit),
+                        search: searchQuery,
+                        sortBy:
+                          selected === "all"
+                            ? "id"
+                            : selected === "Top Rated"
+                            ? "score"
+                            : "id",
+                      });
+                      setPage(Math.ceil(pagination.total / pagination.limit));
+                    }}
+                  >
+                    <Text className="text-black text-[12px] font-bold">
+                      {Math.ceil(pagination.total / pagination.limit)}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
+                <TouchableOpacity
+                  disabled={page >= pagination.total / pagination.limit}
+                  className={`${
+                    page < pagination.total / pagination.limit
+                      ? "bg-primaryDarker"
+                      : "bg-primary/40"
+                  } rounded-md py-1.5 px-3`}
+                  onPress={() => {
+                    loadMovies({
+                      page: page + 1,
+                      search: searchQuery,
+                      sortBy:
+                        selected === "all"
+                          ? "id"
+                          : selected === "Top Rated"
+                          ? "score"
+                          : "id",
+                    });
+                    setPage(page + 1);
+                  }}
+                >
+                  <Text className="text-black text-[12px] font-bold">Next</Text>
+                </TouchableOpacity>
+              </View>
             ) : null}
           </View>
         }

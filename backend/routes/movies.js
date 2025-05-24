@@ -122,39 +122,40 @@ moviesRouter.get("/moviesSearch", async (req, res) => {
       minViews = 0, // 👈 OPTIONAL
       minFavorites = 0, // 👈 OPTIONAL
     } = req.query;
-    console.log('sortBy', sortBy)
 
     const offset = (page - 1) * limit;
-    console.log("page", page);
-    console.log("limit", limit);
-    console.log("offset", offset);
 
     let sql = `SELECT * FROM movies WHERE 1`;
+    let paginateSql = `SELECT COUNT(*) as count FROM movies WHERE 1`
     const params = [];
 
     if (search) {
       sql += ` AND LOWER(title) LIKE ?`;
+      paginateSql += ` AND LOWER(title) LIKE ?`;
       params.push(`%${search.toLowerCase()}%`);
     }
 
     if (genre) {
       sql += ` AND genre = ?`;
+      paginateSql += ` AND genre = ?`;
       params.push(genre);
     }
 
     if (Number(minRating)) {
       sql += ` AND score >= ?`;
+      paginateSql += ` AND score >= ?`;
       params.push(Number(minRating));
     }
 
     if (Number(minViews)) {
-      console.log('min Views working', typeof minViews)
       sql += ` AND views >= ?`;
+      paginateSql += ` AND views >= ?`;
       params.push(Number(minViews));
     }
 
     if (Number(minFavorites)) {
       sql += ` AND favorites >= ?`;
+      paginateSql += ` AND favorites >= ?`;
       params.push(Number(minFavorites));
     }
 
@@ -165,13 +166,15 @@ moviesRouter.get("/moviesSearch", async (req, res) => {
     }
     const dir = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     sql += ` ORDER BY \`${sortBy}\` ${dir}`;
+    paginateSql += ` ORDER BY \`${sortBy}\` ${dir}`;
 
     sql += ` LIMIT ? OFFSET ?`;
     params.push(Number(limit), Number(offset));
-
     // 7️⃣ Execute
     const [movies] = await db.query(sql, params);
-    res.json({ movies });
+    const [moviesLength] = await db.query(paginateSql, params);
+    const pagination = { page, limit, offset, total: moviesLength[0].count };
+    res.json({ movies, pagination });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

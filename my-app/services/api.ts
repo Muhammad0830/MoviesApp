@@ -171,7 +171,7 @@ export const GetSearchMovies = async (options: any = {}) => {
 
     const data = await response.json();
 
-    return data.movies;
+    return data;
   } catch (err) {
     console.error(err);
   }
