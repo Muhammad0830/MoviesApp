@@ -125,6 +125,9 @@ moviesRouter.get("/moviesSearch", async (req, res) => {
     console.log('sortBy', sortBy)
 
     const offset = (page - 1) * limit;
+    console.log("page", page);
+    console.log("limit", limit);
+    console.log("offset", offset);
 
     let sql = `SELECT * FROM movies WHERE 1`;
     const params = [];
