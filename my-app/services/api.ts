@@ -170,13 +170,6 @@ export const GetSearchMovies = async (options: any = {}) => {
     }
 
     const data = await response.json();
-    
-    console.log(
-      "data",
-      data.movies?.map((item: any) => {
-        return { id: item.id, title: item.title, score: item.score };
-      })
-    );
 
     return data.movies;
   } catch (err) {

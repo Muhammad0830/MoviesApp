@@ -49,7 +49,7 @@ const search = () => {
   } = useFetch(GetSearchMovies, { order: "ASC" });
 
   const handleSearch = debounce((text: string) => {
-    refetchSearchMovies({ search: text, page: page });
+    refetchSearchMovies({ search: text, page: 1 });
   }, 300);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const search = () => {
   }, [data]);
 
   const handleFilter = (filterOptions = {}) => {
-    refetchSearchMovies({ ...filterOptions, page: page });
+    refetchSearchMovies(filterOptions);
   };
 
   useFocusEffect(
@@ -164,7 +164,8 @@ const search = () => {
                     selected === "Top Rated" ? "bg-primary" : ""
                   }`}
                   onPress={() => {
-                    handleFilter({ sortBy: "score", order: "DESC" });
+                    handleFilter({ sortBy: "score", order: "DESC", page: 1 });
+                    setPage(1);
                     setSelected("Top Rated");
                   }}
                 >
@@ -238,7 +239,7 @@ const search = () => {
               <TouchableOpacity
                 className="bg-primaryDarker rounded-lg py-2 px-4"
                 onPress={() => {
-                  loadMovies({ page: page + 1, search: searchQuery });
+                  loadMovies({ page: page + 1, search: searchQuery, sortBy: selected === "all" ? "id" : selected === "Top Rated" ? "score" : "id" });
                   setPage(page + 1);
                 }}
               >
