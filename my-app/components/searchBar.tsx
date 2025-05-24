@@ -35,7 +35,7 @@ const searchBar = ({
   const [isOpen, setIsOpen] = React.useState(false);
 
   const containerWidth = useRef(new Animated.Value(1)).current;
-  const paddingLeft = useRef(new Animated.Value(0)).current;
+  const paddingLeft = useRef(new Animated.Value(40)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
