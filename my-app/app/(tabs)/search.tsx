@@ -57,7 +57,7 @@ const search = () => {
   }, [data]);
 
   const handleFilter = (filterOptions = {}) => {
-    refetchSearchMovies({ ...filterOptions, page: page});
+    refetchSearchMovies({ ...filterOptions, page: page });
   };
 
   useFocusEffect(
@@ -97,6 +97,11 @@ const search = () => {
   const translateY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (!isOpen) {
+      refetchSearchMovies(defaultParams);
+      setSelected("All");
+    }
+
     Animated.timing(translateY, {
       toValue: isOpen ? 0 : -350,
       duration: 200,
@@ -212,7 +217,9 @@ const search = () => {
               </View>
             ) : isOpen ? (
               <View className="mb-2">
-                <Text className="text-white text-[20px] font-bold">{selected} movies</Text>
+                <Text className="text-white text-[20px] font-bold">
+                  {selected} movies
+                </Text>
               </View>
             ) : (
               <View>
