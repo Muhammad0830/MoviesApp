@@ -19,6 +19,7 @@ import { fetchMovies } from "@/services/api";
 import MovieCard from "@/components/movieCard";
 import { useAuth } from "@/contexts/authContext";
 import HorizontalMovieCard from "@/components/horizontalMovieCard";
+import { ChevronRight } from 'lucide-react-native';
 
 export default function Index() {
   const router = useRouter();
@@ -122,10 +123,16 @@ export default function Index() {
                   onChangeText={(text: string) => setQuery(text)}
                 />
               </View>
-              <View className="mb-2">
+              <View className="mb-2 flex-row justify-between items-center">
                 <Text className="text-white text-[20px] font-bold">
                   Top Rated
                 </Text>
+                <Link href={"../topRated/topRated" as any} asChild>
+                  <Pressable className="flex-row items-center">
+                    <Text className="text-primary text-[14px]">See more</Text>
+                    <ChevronRight size={15} color='#b297f0'/>
+                  </Pressable>
+                </Link>
               </View>
               <FlatList
                 data={topRated}
