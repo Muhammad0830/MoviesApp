@@ -35,6 +35,7 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
+  console.log("login");
   const { email, password } = req.body;
 
   const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [
