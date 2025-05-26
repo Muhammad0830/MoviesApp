@@ -12,14 +12,12 @@ import {
   Image,
   ActivityIndicator,
   Modal,
-  Button,
-  StyleSheet,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBookmark as solidBookmark } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark as regularBookmark } from "@fortawesome/free-regular-svg-icons";
-import { FlatList, Pressable } from "react-native-gesture-handler";
+import { FlatList, Pressable, TextInput } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import useFetch from "@/services/useFetch";
 import {
@@ -37,16 +35,24 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { Star } from "lucide-react-native";
+// import start half stroke from fontawesome
+import {
+  faStarHalfStroke,
+  faStar,
+  faStarHalfAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 const MovieDetails = ({ movie }: any) => {
-  const [movies, setMovies] = useState([]);
-  const [savedMovies, setSavedMovies] = useState([]);
   const [shuffleMovies, setShuffleMovies] = useState([]);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { data, loading, error } = useFetch(() => fetchMovies({ query: "" }));
   const navigation = useNavigation();
   const { user } = useAuth();
   const [visible, setVisible] = useState(false);
+  const [isOpenRate, setIsOpenRate] = useState(false);
+  const [rate, setRate] = useState(0.9);
+  const [value, setValue] = useState<any>(0);
 
   const {
     data: saved_Movies,
@@ -68,14 +74,12 @@ const MovieDetails = ({ movie }: any) => {
         (item: any) =>
           item.title !== movie.title && item.description !== movie.description
       );
-      setMovies(filtered);
       setShuffleMovies(randomShuffle(filtered) as any);
     }
   }, [data]);
 
   useEffect(() => {
     if (saved_Movies) {
-      setSavedMovies(saved_Movies);
       if (saved_Movies?.some((item: any) => item.id === movie.id)) {
         setIsBookmarked(true);
       }
@@ -101,6 +105,24 @@ const MovieDetails = ({ movie }: any) => {
     ),
     []
   );
+
+  const handleChange = (text: string) => {
+    // Allow only digits
+    if (!/^\d*$/.test(text)) return;
+
+    const num = parseInt(text, 10);
+
+    // Empty input is allowed
+    if (text === "") {
+      setValue("");
+    } else if (num >= 0 && num <= 10) {
+      setValue(text);
+    }
+  };
+
+  useEffect(() => {
+    console.log("value", value);
+  }, [value]);
 
   if (loading) {
     return (
@@ -131,7 +153,7 @@ const MovieDetails = ({ movie }: any) => {
           visible={visible}
           onRequestClose={() => setVisible(false)}
         >
-          <View style={styles.modalOverlay} className="justify-center flex-1">
+          <View className="justify-center flex-1">
             <View className="w-[80%] mx-auto p-5 rounded-lg elevation-lg bg-white">
               <View className="mb-2">
                 <Text className="text-bg_primary text-[16px] font-bold">
@@ -227,9 +249,15 @@ const MovieDetails = ({ movie }: any) => {
               <View className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 ">
                 <FontAwesome name="download" size={17} color="white" />
               </View>
-              <View className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 ">
+              <TouchableOpacity
+                onPress={() => {
+                  setIsOpenRate(true);
+                  handleSheetOpen();
+                }}
+                className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
+              >
                 <FontAwesome name="thumbs-up" size={17} color="white" />
-              </View>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   if (!isBookmarked) {
@@ -283,17 +311,100 @@ const MovieDetails = ({ movie }: any) => {
         backdropComponent={renderBackdrop}
         handleIndicatorStyle={{ backgroundColor: "#8a5fed" }}
         backgroundStyle={{ backgroundColor: "#222222" }}
+        onClose={() => setIsOpenRate(false)}
       >
-        <BottomSheetView style={{ flex: 1, paddingInline: 20, paddingTop: 10 }}>
-          <Text className="text-white text-[14px]">
-            <Text className="text-white font-bold">Genre: </Text>
-            {movie.genre.join(", ")}
-          </Text>
-          <Text className="text-white text-[12px] mt-2">
-            {movie.description}
-          </Text>
+        {isOpenRate ? (
+          <BottomSheetView className="px-5 pt-2.5">
+            <Text className="text-white text-[16px] font-bold text-center">
+              Rate this movie
+            </Text>
+            <Text className="text-white text-[12px] text-center mb-3">
+              {movie.title}
+            </Text>
 
-          {/* <View className="w-full flex-row justify-end mt-4">
+            <View className="items-center">
+              <View className="flex-row gap-[2px] items-center">
+                {Array.from({ length: 10 }).map((_, i) => {
+                  if (i + 1 <= rate) {
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        onPress={() => {
+                          setRate(i + 1);
+                          setValue(i + 1);
+                        }}
+                      >
+                        <Text>
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            size={24}
+                            color="gold"
+                          />
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      onPress={() => {
+                        setRate(i + 1);
+                        setValue(i + 1);
+                      }}
+                    >
+                      <Text>
+                        <Star color="gold" size={24} />
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <View className="flex-row items-center justify-center gap-1 mt-4">
+                <View className="border border-white/50 rounded-md items-center justify-center bg-primary/40 w-14 aspect-square">
+                  <TextInput
+                    className="text-white text-[24px] font-bold p-2 w-full h-full text-center justify-center items-center"
+                    placeholder={`${value}`}
+                    value={`${value == "0" ? "" : value}`}
+                    onChangeText={handleChange}
+                    placeholderTextColor={"#999999"}
+                    onSubmitEditing={() => {
+                      setRate(value as any);
+                    }}
+                  />
+                </View>
+
+                <Text className="text-white text-[20px] font-bold">/</Text>
+                <View className="border border-white/50 rounded-md items-center justify-center bg-primary/40 w-14 aspect-square">
+                  <Text className="text-white text-[24px] font-bold">10</Text>
+                </View>
+              </View>
+
+              <View className="flex-row mt-4 gap-10">
+                <TouchableOpacity onPress={handleSheetClose} className="px-5 py-2 rounded-md bg-red-500 justify-center items-center">
+                  <Text className="text-white text-[20px] font-bold">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleSheetClose} className="px-5 py-2 rounded-md bg-primaryDarker justify-center items-center">
+                  <Text className="text-white text-[20px] font-bold">Rate</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </BottomSheetView>
+        ) : (
+          <BottomSheetView
+            style={{ flex: 1, paddingInline: 20, paddingTop: 10 }}
+          >
+            <Text className="text-white text-[14px]">
+              <Text className="text-white font-bold">Genre: </Text>
+              {movie.genre.join(", ")}
+            </Text>
+            <Text className="text-white text-[12px] mt-2">
+              {movie.description}
+            </Text>
+
+            {/* <View className="w-full flex-row justify-end mt-4">
             <TouchableOpacity
               onPress={handleSheetClose}
               className="p-3 rounded-lg bg-red-500"
@@ -301,40 +412,11 @@ const MovieDetails = ({ movie }: any) => {
               <Text className="text-white text-[12px] font-bold">Close</Text>
             </TouchableOpacity>
           </View> */}
-        </BottomSheetView>
+          </BottomSheetView>
+        )}
       </BottomSheet>
-
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isOpen}
-        onRequestClose={() => setIsOpen((prev) => !prev)}
-        className="flex-1 justify-center items-center"
-      >
-        <View className="bg-red-500 flex-1 w-full justify-center py-10">
-          <View className="bg-white rounded-lg p-10">
-            <Text>this is modal</Text>
-            <Button title="Close" onPress={() => setIsOpen((prev) => !prev)} />
-          </View>
-        </View>
-      </Modal> */}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
-  },
-  modalContent: {
-    margin: 20,
-    backgroundColor: "white",
-    padding: 25,
-    borderRadius: 10,
-    elevation: 5,
-  },
-});
 
 export default MovieDetails;
