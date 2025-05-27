@@ -178,9 +178,6 @@ export const GetSearchMovies = async (options: any = {}) => {
 };
 
 export const RateMovie = async ({ movieId, userId, rate }: { movieId: number, userId: number, rate: number }) => {
-  console.log('rate', rate)
-  console.log('movieId', movieId)
-  console.log('userId', userId)
   const endpoint = `${URL_CONFIG.BASE_URL}/movies/rate`;
   const response = await fetch(endpoint, {
     body: JSON.stringify({ movieId, userId, rate }),
@@ -209,6 +206,6 @@ export const GetMoviesRatings = async ({ movieId, userId }: {movieId: Number, us
   }
 
   const data = await response.json();
-  console.log('data', data)
+
   return data;
 }

@@ -210,9 +210,6 @@ moviesRouter.post("/rate", async (req, res) => {
   try {
     console.log("rating a movie...");
     const { movieId, userId, rate } = req.body;
-    console.log("movieId", movieId);
-    console.log("userId", userId);
-    console.log("rate", rate);
 
     if (!movieId || !userId) {
       return res.status(400).json({ error: "id is required" });
@@ -237,8 +234,6 @@ moviesRouter.post("/rate", async (req, res) => {
             FROM ratings
             WHERE movie_id = ${movieId};`);
 
-    console.log("averageScore", averageScore[0].average_score);
-
     const updateMovieScore = await db.query(`UPDATE movies
             SET score = ${averageScore[0].average_score}
             WHERE id = ${movieId};`);
@@ -249,11 +244,8 @@ moviesRouter.post("/rate", async (req, res) => {
 
 moviesRouter.get("/ratedMovie/:movieId/users/:userId", async (req, res) => {
   try {
-    console.log("getting a ratings ...");
+    console.log("getting ratings ...");
     const { movieId, userId } = req.params;
-
-    console.log("movieId", movieId);
-    console.log("userId", userId);
 
     if (!movieId || !userId) {
       return res.status(400).json({ error: "id is required" });
@@ -263,7 +255,6 @@ moviesRouter.get("/ratedMovie/:movieId/users/:userId", async (req, res) => {
       `SELECT * FROM ratings WHERE movie_id = ${movieId} AND user_id = ${userId};`
     );
 
-    console.log("ratings", ratings[0]);
     return res.status(200).json(ratings[0]);
     if (ratings.length > 0) {
     } else {
