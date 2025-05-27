@@ -176,3 +176,36 @@ export const GetSearchMovies = async (options: any = {}) => {
     console.error(err);
   }
 };
+
+export const RateMovie = async ({ movieId, userId, rate }: { movieId: number, userId: number, rate: number }) => {
+  const endpoint = `${URL_CONFIG.BASE_URL}/movies/rate`;
+  const response = await fetch(endpoint, {
+    body: JSON.stringify({ movieId, userId, rate }),
+    method: "POST",
+    headers: URL_CONFIG.headers,
+  })
+
+  if(!response.ok){
+    console.log('failed to fetch data')
+  }
+
+  const data = await response.json();
+
+  return data;
+}
+
+export const GetMoviesRatings = async ({ movieId, userId }: {movieId: Number, userId: Number}) => {
+  const endpoint = `${URL_CONFIG.BASE_URL}/movies/ratedMovie/${movieId}/users/${userId}`;
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: URL_CONFIG.headers,
+  });
+
+  if(!response.ok){
+    console.log('failed to fetch data')
+  }
+
+  const data = await response.json();
+
+  return data;
+}

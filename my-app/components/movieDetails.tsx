@@ -23,7 +23,9 @@ import useFetch from "@/services/useFetch";
 import {
   DeleteFromSavedMovies,
   fetchMovies,
+  GetMoviesRatings,
   GetSavedMovies,
+  RateMovie,
   SaveMovie,
 } from "@/services/api";
 import MovieCard from "./movieCard";
@@ -35,7 +37,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { Star } from "lucide-react-native";
+import { Star, ThumbsUp } from "lucide-react-native";
 // import start half stroke from fontawesome
 import {
   faStarHalfStroke,
@@ -53,6 +55,7 @@ const MovieDetails = ({ movie }: any) => {
   const [isOpenRate, setIsOpenRate] = useState(false);
   const [rate, setRate] = useState(0.9);
   const [value, setValue] = useState<any>(0);
+  const [ratings, setRatings] = useState<any>({});
 
   const {
     data: saved_Movies,
@@ -61,6 +64,25 @@ const MovieDetails = ({ movie }: any) => {
     reset: resetSaved,
     refetch: refetchSaved,
   } = useFetch(() => GetSavedMovies(user?.id));
+
+  const lastFetchedIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (movie?.id && movie.id !== lastFetchedIdRef.current) {
+      lastFetchedIdRef.current = movie.id;
+      handleFetchingRatings();
+    }
+  }, [movie?.id]);
+
+  const handleFetchingRatings = async () => {
+    if (movie.id) {
+      const ratingsData = await GetMoviesRatings({
+        movieId: movie.id,
+        userId: user?.id,
+      } as any);
+      setRatings(ratingsData);
+    }
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -85,6 +107,13 @@ const MovieDetails = ({ movie }: any) => {
       }
     }
   }, [saved_Movies]);
+
+  useEffect(() => {
+    if (ratings.id) {
+      setRate(ratings.score);
+      setValue(ratings.score);
+    }
+  }, [ratings]);
 
   const randomShuffle = (arr: any[]) => {
     return arr.sort(() => Math.random() - 0.5);
@@ -120,9 +149,9 @@ const MovieDetails = ({ movie }: any) => {
     }
   };
 
-  useEffect(() => {
-    console.log("value", value);
-  }, [value]);
+  const handleRate = (movieId: any, rate: any) => {
+    RateMovie({ movieId: movieId, userId: user?.id, rate: rate } as any);
+  };
 
   if (loading) {
     return (
@@ -221,7 +250,7 @@ const MovieDetails = ({ movie }: any) => {
                 <View className="flex-row items-center gap-2">
                   <FontAwesome name="star" size={15} color="yellow" />
                   <Text className="text-white text-[12px] font-bold">
-                    {movie.score / 10} / 10
+                    {movie.score} / 10
                   </Text>
                 </View>
                 <Text className="text-white text-[12px] font-bold">
@@ -256,7 +285,12 @@ const MovieDetails = ({ movie }: any) => {
                 }}
                 className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
               >
-                <FontAwesome name="thumbs-up" size={17} color="white" />
+                {ratings.id ? (
+                  <FontAwesome name="thumbs-up" size={17} color="white" />
+                ) : (
+                  // <ThumbsUp color="white" size={17} />
+                  <ThumbsUp color="white" size={17} />
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -322,6 +356,19 @@ const MovieDetails = ({ movie }: any) => {
               {movie.title}
             </Text>
 
+            {ratings.id ? (
+              <View className="items-center mb-2">
+                <Text className="text-primary text-[16px]">
+                  You have already rated this movie
+                </Text>
+                <Text className="text-primary text-[16px]">Want to update?</Text>
+              </View>
+            ) : (
+              <View className="items-center mb-2">
+                <Text className="text-primary text-[16px]">You haven't rated this movie yet</Text>
+              </View>
+            )}
+
             <View className="items-center">
               <View className="flex-row gap-[2px] items-center">
                 {Array.from({ length: 10 }).map((_, i) => {
@@ -381,12 +428,23 @@ const MovieDetails = ({ movie }: any) => {
               </View>
 
               <View className="flex-row mt-4 gap-10">
-                <TouchableOpacity onPress={handleSheetClose} className="px-5 py-2 rounded-md bg-red-500 justify-center items-center">
+                <TouchableOpacity
+                  onPress={() => {
+                    handleSheetClose();
+                  }}
+                  className="px-5 py-2 rounded-md bg-red-500 justify-center items-center"
+                >
                   <Text className="text-white text-[20px] font-bold">
                     Cancel
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleSheetClose} className="px-5 py-2 rounded-md bg-primaryDarker justify-center items-center">
+                <TouchableOpacity
+                  onPress={() => {
+                    handleRate(movie.id as any, rate as any);
+                    handleSheetClose();
+                  }}
+                  className="px-5 py-2 rounded-md bg-primaryDarker justify-center items-center"
+                >
                   <Text className="text-white text-[20px] font-bold">Rate</Text>
                 </TouchableOpacity>
               </View>

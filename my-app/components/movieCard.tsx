@@ -30,7 +30,7 @@ const MovieCard = ({ item, gridNum, gap }: any) => {
             <View className="flex flex-row justify-between items-center">
               <View className="flex flex-row gap-1 items-center">
                 <Image source={icons.star} className="w-2 h-2" />
-                <Text className="text-white text-[8px]">{item.score / 10}</Text>
+                <Text className="text-white text-[8px]">{item.score}</Text>
               </View>
               <Text className="text-white text-[8px] font-light">
                 {item.release_date}

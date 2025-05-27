@@ -126,7 +126,7 @@ moviesRouter.get("/moviesSearch", async (req, res) => {
     const offset = (page - 1) * limit;
 
     let sql = `SELECT * FROM movies WHERE 1`;
-    let paginateSql = `SELECT COUNT(*) as count FROM movies WHERE 1`
+    let paginateSql = `SELECT COUNT(*) as count FROM movies WHERE 1`;
     const params = [];
 
     if (search) {
@@ -203,6 +203,66 @@ moviesRouter.delete("/savedMovies/:movieId/users/:userId", async (req, res) => {
     }
   } catch (err) {
     return res.status(500).send({ error: err.message });
+  }
+});
+
+moviesRouter.post("/rate", async (req, res) => {
+  try {
+    console.log("rating a movie...");
+    const { movieId, userId, rate } = req.body;
+
+    if (!movieId || !userId) {
+      return res.status(400).json({ error: "id is required" });
+    }
+
+    if (!rate) {
+      return res.status(400).json({ error: "rate is required" });
+    }
+
+    const rating = await db.query(
+      `INSERT INTO ratings (user_id, movie_id, score)
+            VALUES (:userId, :movieId, :score)
+            ON DUPLICATE KEY UPDATE score = VALUES(score);`,
+      {
+        userId: userId,
+        movieId: movieId,
+        score: rate,
+      }
+    );
+
+    const [averageScore] = await db.query(`SELECT AVG(score) AS average_score
+            FROM ratings
+            WHERE movie_id = ${movieId};`);
+
+    const updateMovieScore = await db.query(`UPDATE movies
+            SET score = ${averageScore[0].average_score}
+            WHERE id = ${movieId};`);
+  } catch (err) {
+    console.error({ error: err.message });
+  }
+});
+
+moviesRouter.get("/ratedMovie/:movieId/users/:userId", async (req, res) => {
+  try {
+    console.log("getting ratings ...");
+    const { movieId, userId } = req.params;
+
+    if (!movieId || !userId) {
+      return res.status(400).json({ error: "id is required" });
+    }
+
+    const [ratings] = await db.query(
+      `SELECT * FROM ratings WHERE movie_id = ${movieId} AND user_id = ${userId};`
+    );
+
+    return res.status(200).json(ratings[0]);
+    if (ratings.length > 0) {
+    } else {
+      return res.status(200).json({});
+    }
+  } catch (err) {
+    console.log("error");
+    console.error({ error: err.message });
   }
 });
 
