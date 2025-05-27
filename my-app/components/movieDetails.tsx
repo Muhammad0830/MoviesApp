@@ -56,6 +56,7 @@ const MovieDetails = ({ movie }: any) => {
   const [rate, setRate] = useState(0.9);
   const [value, setValue] = useState<any>(0);
   const [ratings, setRatings] = useState<any>({});
+  const [isRated, setIsRated] = useState(false);
 
   const {
     data: saved_Movies,
@@ -112,6 +113,7 @@ const MovieDetails = ({ movie }: any) => {
     if (ratings.id) {
       setRate(ratings.score);
       setValue(ratings.score);
+      setIsRated(true);
     }
   }, [ratings]);
 
@@ -151,6 +153,12 @@ const MovieDetails = ({ movie }: any) => {
 
   const handleRate = (movieId: any, rate: any) => {
     RateMovie({ movieId: movieId, userId: user?.id, rate: rate } as any);
+    setIsRated(true);
+  };
+
+  const formatNumber = (value: number): string => {
+    let number = Number(value);
+    return number.toString();
   };
 
   if (loading) {
@@ -183,15 +191,15 @@ const MovieDetails = ({ movie }: any) => {
           onRequestClose={() => setVisible(false)}
         >
           <View className="justify-center flex-1">
-            <View className="w-[80%] mx-auto p-5 rounded-lg elevation-lg bg-white">
+            <View className="w-[80%] mx-auto p-5 rounded-lg elevation-lg bg-black">
               <View className="mb-2">
-                <Text className="text-bg_primary text-[16px] font-bold">
+                <Text className="text-white text-[16px] font-bold">
                   Delete from Saved movies?
                 </Text>
               </View>
               <View className="w-full flex-row justify-between">
                 <TouchableOpacity
-                  className="bg-bg_primary rounded-lg py-2 px-4"
+                  className="bg-red-500 rounded-lg py-2 px-4"
                   onPress={() => {
                     setVisible(false);
                   }}
@@ -250,7 +258,7 @@ const MovieDetails = ({ movie }: any) => {
                 <View className="flex-row items-center gap-2">
                   <FontAwesome name="star" size={15} color="yellow" />
                   <Text className="text-white text-[12px] font-bold">
-                    {movie.score} / 10
+                    {formatNumber(movie.score)} / 10
                   </Text>
                 </View>
                 <Text className="text-white text-[12px] font-bold">
@@ -285,7 +293,7 @@ const MovieDetails = ({ movie }: any) => {
                 }}
                 className="rounded-full w-10 aspect-square items-center justify-center bg-primary/40 "
               >
-                {ratings.id ? (
+                {isRated ? (
                   <FontAwesome name="thumbs-up" size={17} color="white" />
                 ) : (
                   // <ThumbsUp color="white" size={17} />
@@ -361,11 +369,15 @@ const MovieDetails = ({ movie }: any) => {
                 <Text className="text-primary text-[16px]">
                   You have already rated this movie
                 </Text>
-                <Text className="text-primary text-[16px]">Want to update?</Text>
+                <Text className="text-primary text-[16px]">
+                  Want to update?
+                </Text>
               </View>
             ) : (
               <View className="items-center mb-2">
-                <Text className="text-primary text-[16px]">You haven't rated this movie yet</Text>
+                <Text className="text-primary text-[16px]">
+                  You haven't rated this movie yet
+                </Text>
               </View>
             )}
 
