@@ -255,12 +255,18 @@ const MovieDetails = ({ movie }: any) => {
 
             <View className="flex-row justify-center">
               <View className="flex-row items-center justify-center my-4 gap-6 bg-primary/40 rounded-full py-2 px-4">
-                <View className="flex-row items-center gap-2">
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsOpenRate(true);
+                    handleSheetOpen();
+                  }}
+                  className="flex-row items-center gap-2"
+                >
                   <FontAwesome name="star" size={15} color="yellow" />
                   <Text className="text-white text-[12px] font-bold">
                     {formatNumber(movie.score)} / 10
                   </Text>
-                </View>
+                </TouchableOpacity>
                 <Text className="text-white text-[12px] font-bold">
                   {movie.running_time} minutes
                 </Text>
@@ -423,8 +429,8 @@ const MovieDetails = ({ movie }: any) => {
                 <View className="border border-white/50 rounded-md items-center justify-center bg-primary/40 w-14 aspect-square">
                   <TextInput
                     className="text-white text-[24px] font-bold p-2 w-full h-full text-center justify-center items-center"
-                    placeholder={`${value}`}
-                    value={`${value == "0" ? "" : value}`}
+                    placeholder={`${formatNumber(value)}`}
+                    value={`${value == "0" ? "" : formatNumber(value)}`}
                     onChangeText={handleChange}
                     placeholderTextColor={"#999999"}
                     onSubmitEditing={() => {

@@ -29,7 +29,6 @@ export const fetchMovies = async ({ query }: { query: string }) => {
 };
 
 export const fetchEachMovie = async ({ id }: { id: number }) => {
-  console.log("fetching a movie...");
   const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesDB/${id}`;
 
   const response = await fetch(endpoint, {
@@ -56,7 +55,6 @@ export const SaveMovie = async ({
   try {
     console.log("saving a movie...");
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies`;
-    console.log("endpoint", endpoint);
     const response = await fetch(endpoint, {
       method: "POST",
       headers: URL_CONFIG.headers,
@@ -78,8 +76,6 @@ export const SaveMovie = async ({
 
 export const GetSavedMovies = async (id: any) => {
   try {
-    console.log("getting saved movies...");
-    console.log("id user", id);
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}`;
     const response = await fetch(endpoint, {
       method: "GET",
@@ -93,7 +89,6 @@ export const GetSavedMovies = async (id: any) => {
     }
 
     if (!response.ok) {
-      console.log("response", data.message);
       throw new Error("Failed to fetch data");
     }
 
@@ -111,9 +106,6 @@ export const DeleteFromSavedMovies = async ({
   userId: number;
 }) => {
   try {
-    console.log("deleting a movie...");
-    console.log("id", id);
-    console.log("userId", userId);
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/savedMovies/${id}/users/${userId}`;
     const response = await fetch(endpoint, {
       method: "DELETE",
@@ -158,7 +150,6 @@ export const GetUser = async (id: number) => {
 export const GetSearchMovies = async (options: any = {}) => {
   try {
     const params = new URLSearchParams(options).toString();
-    console.log("params", options);
     const endpoint = `${URL_CONFIG.BASE_URL}/movies/moviesSearch?${params}`;
     const response = await fetch(endpoint, {
       method: "GET",
@@ -186,7 +177,7 @@ export const RateMovie = async ({ movieId, userId, rate }: { movieId: number, us
   })
 
   if(!response.ok){
-    console.log('failed to fetch data')
+    throw new Error("Failed to delete a movie");
   }
 
   const data = await response.json();
@@ -202,7 +193,7 @@ export const GetMoviesRatings = async ({ movieId, userId }: {movieId: Number, us
   });
 
   if(!response.ok){
-    console.log('failed to fetch data')
+    throw new Error("Failed to delete a movie");
   }
 
   const data = await response.json();
