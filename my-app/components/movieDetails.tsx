@@ -480,15 +480,6 @@ const MovieDetails = ({ movie }: any) => {
             <Text className="text-white text-[12px] mt-2">
               {movie.description}
             </Text>
-
-            {/* <View className="w-full flex-row justify-end mt-4">
-            <TouchableOpacity
-              onPress={handleSheetClose}
-              className="p-3 rounded-lg bg-red-500"
-            >
-              <Text className="text-white text-[12px] font-bold">Close</Text>
-            </TouchableOpacity>
-          </View> */}
           </BottomSheetView>
         )}
       </BottomSheet>
