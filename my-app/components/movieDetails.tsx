@@ -235,6 +235,7 @@ const MovieDetails = ({ movie }: any) => {
         columnWrapperStyle={{
           marginVertical: 5,
           paddingHorizontal: 10,
+          gap: 10,
           justifyContent: "space-between",
         }}
         ListHeaderComponent={

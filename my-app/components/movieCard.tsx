@@ -11,7 +11,6 @@ const MovieCard = ({ item, gridNum, gap }: any) => {
 
   const formatNumber = (value: number): string => {
     let number = Number(value);
-
     return number.toString();
   };
 
